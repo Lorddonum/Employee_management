@@ -79,7 +79,7 @@ void ajout_emp(EMPLOYE *head){
     }
 
     //Allocating and getting stuff ready
-    EMPLOYE *node=NULL;
+    EMPLOYE *node;
     node=(EMPLOYE*)malloc(sizeof(EMPLOYE));
     if(node==NULL){
         fprintf(stderr,"Error value: %d\n", errno);
@@ -341,14 +341,18 @@ int main(void){
         for(i=w.ws_col;i!=0;i--){
             printf("=");
         }
-        puts("\t\tWELCOME TO DICTATONARIA"
-                "Choose one of the options below:"
-                "1 - Adding employee"
-                "2 - ((Murdering)Firing) Delete employee"
-                "3 - Modify employee(Brain wash)"
-                "4 - Search employee"
-                "5 - Quit"
-                "\nChoice: ");
+        printf("\n\t\t\t\tWELCOME TO DICTATONARIA\n");
+        for(i=w.ws_col;i!=0;i--){
+            printf("=");
+        }
+
+        puts("\n\nChoose one of the options below:\n\n"
+                "1 - Adding employee\n"
+                "2 - ((Murdering)Firing) Delete employee\n"
+                "3 - Modify employee(Brain wash)\n"
+                "4 - Search employee\n"
+                "5 - Quit\n");
+        printf("Choice: ");
         while(!scanf("%d",&choice) || choice>5 || choice<1){
             printf("Choice: ");
         }
