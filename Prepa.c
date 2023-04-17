@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <errno.h>
 #include <sys/ioctl.h>
 
 extern int errno;
@@ -333,7 +334,6 @@ int main(void){
     int choice, i;
     struct winsize w;
     ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
-    head=NULL;
     head->next=NULL;
 
     while(1){
