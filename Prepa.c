@@ -21,10 +21,10 @@ typedef struct emp{
 int checkString(char *buffer){
     int n=strlen(buffer);
     for(;n!=0;n--){
-        if(!(buffer[n]<='Z' && buffer[n]>='A'))
-            return 0;
+        if((buffer[n]<='Z' && buffer[n]>='A')||(buffer[n]<='z' && buffer[n]>='a'))
+            return 1;
     }
-    return 1;
+    return 0;
 }
 
 void remplissage(EMPLOYE *A){
@@ -32,76 +32,63 @@ void remplissage(EMPLOYE *A){
     system("clear");
 
     while(1){
-        printf("\t\tNom: ");
-        fgets(buffer,100,stdin);
+        printf("\n\tNom: ");
+        scanf("%s",buffer);
         if(checkString(buffer)==1){
-            strcpy(buffer,A->nom);
+            A->nom=(char*)malloc(100*sizeof(char));
+            strcpy(A->nom,buffer);
             break;
         } 
     }  
 
     while(1){
-        printf("\t\tPrenom: ");
-        fgets(buffer,100,stdin);
+        printf("\n\tPrenom: ");
+        scanf("%s",buffer);
         if(checkString(buffer)==1){
-            strcpy(buffer,A->prenom);
+            A->prenom=(char*)malloc(100*sizeof(char));
+            strcpy(A->prenom,buffer);
             break;
         }
     }
 
-    printf("\t\tMatricule: ");
+    printf("\n\tMatricule: ");
     while(scanf("%d",&A->mat)!=1){
-        printf("\t\tMatricule:");
+        printf("\n\tMatricule:");
     }
 
-    printf("\t\tSalaire brute: ");
+    printf("\n\tSalaire brute: ");
     while(scanf("%d",&A->sal_Brute)!=1){
-        printf("\t\tSalaire brute: ");
+        printf("\n\tSalaire brute: ");
     }
 
-    printf("\t\tCode Region: ");
+    printf("\n\tCode Region: ");
     while(scanf("%d",&A->region.code_region)!=1){
-        printf("\t\tCode Region: ");
+        printf("\n\tCode Region: ");
     }
 
-    printf("\t\tTaux: ");
+    printf("\n\tTaux: ");
     while(scanf("%d",&A->region.taux)!=1){
-        printf("\t\tTaux: ");
+        printf("\n\tTaux: ");
     }
 }
 
 void ajout_emp(EMPLOYE *head){
-    int n=0;
     //Cycling until the last node with a counter to know if it's the first or else
     while(head->next!=NULL){
-        n++;
         head=head->next;
     }
+    head->next=(EMPLOYE*)malloc(sizeof(EMPLOYE));
 
-    //Allocating and getting stuff ready
-    EMPLOYE *node;
-    node=(EMPLOYE*)malloc(sizeof(EMPLOYE));
-    if(node==NULL){
+    if(head->next==NULL){
         fprintf(stderr,"Error value: %d\n", errno);
         fprintf(stderr, "%s\n", strerror(errno));
         exit(2);
     }
-    node->next=NULL;
 
     //Self explanatory
-    remplissage(node);
+    remplissage(head->next);
 
-    //affecting node to the head
-    if(n==0){
-        head=node;
-        head->next=NULL;
-    }
-
-    //affecting node at the end of the list
-    else {
-        head->next=node;
-        node->next=NULL;
-    }
+    head->next->next=NULL;
 }
 
 void affichage(EMPLOYE *node){
@@ -124,7 +111,7 @@ void modification(EMPLOYE *head, int n){
     //Instead of a long while loop, I opted for a goto when the modifications are all done :) it just looks better in my opinion but
     //idk optimization wise I still gotta check later but it's probably the same
     START:
-    printf("Choisissez quels valeurs voulez-vous changer:\n");
+    printf("Choisissez quelles valeurs voulez-vous changer:\n");
     printf("1 - Nom: %s\n", head->nom);
     printf("2 - Prenom: %s\n", head->prenom);
     printf("3 - Matricule: %d\n", head->mat);
@@ -330,11 +317,13 @@ void recherche(EMPLOYE *head){
 }
 
 int main(void){
-    EMPLOYE *head=(EMPLOYE*)malloc(sizeof(EMPLOYE));
+    EMPLOYE *head=NULL;
+    head=(EMPLOYE*)malloc(sizeof(EMPLOYE));
+    head->next=NULL;
     int choice, i;
     struct winsize w;
     ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
-    head->next=NULL;
+    
 
     while(1){
         system("clear");
