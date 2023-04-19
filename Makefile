@@ -1,10 +1,11 @@
-OBJECTS = Prepa.o utils.o
+OBJECTS = main.o utils.o employee.o disk.o
+CFLAGS = -Og -ggdb
 
 all: $(OBJECTS)
-	cc -o a.out $(OBJECTS)
+	cc $(CFLAGS) -o a.out $(OBJECTS) 
 
 .c.o:
-	cc -c -o $@ $<
+	cc $(CFLAGS) -c -o $@ $<
 
 clean:
 	rm -f $(OBJECTS)
