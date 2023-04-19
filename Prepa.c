@@ -1,9 +1,16 @@
-#include <errno.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
+
+#include <errno.h>
+#include <stddef.h>
+
 #include <sys/ioctl.h>
 #include <unistd.h>
+
+#include "all.h"
 
 extern int errno;
 
@@ -13,14 +20,13 @@ typedef struct reg {
 
 typedef struct emp {
   int mat, sal_Brute;
-  char *nom, *prenom;
+  char *namef, *namel;
   REGION region;
   struct emp *next;
 } EMPLOYE;
 
 int checkString(char *buffer) {
-  int n = strlen(buffer);
-  for (; n != 0; n--) {
+  for (size_t n = strlen(buffer); n != 0; n--) {
     if ((buffer[n] <= 'Z' && buffer[n] >= 'A') ||
         (buffer[n] <= 'z' && buffer[n] >= 'a'))
       return 1;
@@ -32,12 +38,12 @@ void remplissage(EMPLOYE *A) {
   char buffer[100];
   system("clear");
 
-  while (1) {
+  while (true) {
     printf("\n\tNom: ");
     scanf("%s", buffer);
     if (checkString(buffer) == 1) {
-      A->nom = (char *)malloc(100 * sizeof(char));
-      strcpy(A->nom, buffer);
+      A->namef = (char *)malloc(100 * sizeof(char));
+      strcpy(A->namef, buffer);
       break;
     }
   }
@@ -46,8 +52,8 @@ void remplissage(EMPLOYE *A) {
     printf("\n\tPrenom: ");
     scanf("%s", buffer);
     if (checkString(buffer) == 1) {
-      A->prenom = (char *)malloc(100 * sizeof(char));
-      strcpy(A->prenom, buffer);
+      A->namel = (char *)malloc(100 * sizeof(char));
+      strcpy(A->namel, buffer);
       break;
     }
   }
@@ -74,14 +80,13 @@ void remplissage(EMPLOYE *A) {
 }
 
 void ajout_emp(EMPLOYE *head) {
-  int n;
-  // Cycling until the last node with a counter to know if it's the first or
-  // else
+  bool state = false;
+  // Cycling until the last node with a counter to know if it's the first
   while (head->next != NULL) {
-    n++;
+    state |= true;
     head = head->next;
   }
-  if (n != 0) {
+  if (state) {
     head->next = (EMPLOYE *)malloc(sizeof(EMPLOYE));
 
     if (head->next == NULL) {
@@ -98,8 +103,8 @@ void ajout_emp(EMPLOYE *head) {
 }
 
 void affichage(EMPLOYE *node) {
-  printf("Nom:           %s\n", node->nom);
-  printf("Prenom:        %s\n", node->prenom);
+  printf("Nom:           %s\n", node->namef);
+  printf("Prenom:        %s\n", node->namel);
   printf("Matricule:     %d\n", node->mat);
   printf("Salaire brute: %d\n", node->sal_Brute);
   printf("Code region:   %d\n", node->region.code_region);
@@ -119,8 +124,8 @@ void modification(EMPLOYE *head, int n) {
 // still gotta check later but it's probably the same
 START:
   printf("Choisissez quelles valeurs voulez-vous changer:\n");
-  printf("1 - Nom: %s\n", head->nom);
-  printf("2 - Prenom: %s\n", head->prenom);
+  printf("1 - Nom: %s\n", head->namef);
+  printf("2 - Prenom: %s\n", head->namel);
   printf("3 - Matricule: %d\n", head->mat);
   printf("4 - Salaire Brute: %d\n", head->sal_Brute);
   printf("5 - Code Region: %d\n", head->region.code_region);
@@ -129,22 +134,18 @@ START:
 
   printf("\n\nChoix: ");
   while (scanf("%d", &choice) != 1 || choice > 6 || choice < 0) {
-    printf("Wromg imputt uwu\nChoix:");
+    fprintf(stderr, "Wrong input\n");
   }
 
   switch (choice) {
   case 1:
     buffer = (char *)malloc(100 * sizeof(char));
-    if (buffer == NULL) {
-      fprintf(stderr, "Error value: %d\n", errno);
-      fprintf(stderr, "%s\n", strerror(errno));
-      exit(2);
-    }
+    check_alloc(buffer);
     while (1) {
       printf("\tNom: ");
       fgets(buffer, 100, stdin);
       if (checkString(buffer) == 1) {
-        strcpy(buffer, head->nom);
+        strcpy(buffer, head->namef);
         free(buffer);
         break;
       }
@@ -153,16 +154,12 @@ START:
 
   case 2:
     buffer = (char *)malloc(100 * sizeof(char));
-    if (buffer == NULL) {
-      fprintf(stderr, "Error value: %d\n", errno);
-      fprintf(stderr, "%s\n", strerror(errno));
-      exit(2);
-    }
+    check_alloc(buffer);
     while (1) {
       printf("\tPrenom: ");
       fgets(buffer, 100, stdin);
       if (checkString(buffer) == 1) {
-        strcpy(buffer, head->prenom);
+        strcpy(buffer, head->namel);
         free(buffer);
         break;
       }
@@ -258,16 +255,12 @@ RECH:
 
   // Declaring pointers
   int *Mat = malloc(sizeof(int));
+  check_alloc(Mat);
   char *Nom = malloc(sizeof(char));
 
   // Processing
   switch (choice) {
   case 1:
-    if (Mat == NULL) {
-      fprintf(stderr, "Error value: %d\n", errno);
-      fprintf(stderr, "%s\n", strerror(errno));
-      exit(2);
-    }
     printf("Matricule: ");
     while (scanf("%d", Mat) != 1) {
       printf("Matricule: ");
@@ -282,8 +275,8 @@ RECH:
       system("clear");
       goto FREE;
     } else {
-      printf("Aucun employe trouve avec la matricule entree.\nTapez entrer "
-             "pour continuer");
+      printf("Aucun employe trouve avec la matricule entree.\n"
+             "Tapez entrer pour continuer");
       getchar();
       system("clear");
       goto FREE;
@@ -295,10 +288,10 @@ RECH:
       exit(2);
     }
     printf("Nom: ");
-    while (fgets(head->nom, sizeof(head->nom), stdin) == NULL) {
+    while (fgets(head->namef, sizeof(head->namef), stdin) == NULL) {
       printf("Nom: ");
     }
-    while (!(strcmp(head->nom, Nom))) {
+    while (!(strcmp(head->namef, Nom))) {
       head = head->next;
     }
     if (!(head == NULL)) {
