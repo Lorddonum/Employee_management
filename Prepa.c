@@ -73,22 +73,26 @@ void remplissage(EMPLOYE *A){
 }
 
 void ajout_emp(EMPLOYE *head){
+    int n;
     //Cycling until the last node with a counter to know if it's the first or else
     while(head->next!=NULL){
+        n++;
         head=head->next;
     }
-    head->next=(EMPLOYE*)malloc(sizeof(EMPLOYE));
+    if(n!=0){
+        head->next=(EMPLOYE*)malloc(sizeof(EMPLOYE));
 
-    if(head->next==NULL){
-        fprintf(stderr,"Error value: %d\n", errno);
-        fprintf(stderr, "%s\n", strerror(errno));
-        exit(2);
-    }
-
-    //Self explanatory
-    remplissage(head->next);
-
-    head->next->next=NULL;
+        if(head->next==NULL){
+            fprintf(stderr,"Error value: %d\n", errno);
+            fprintf(stderr, "%s\n", strerror(errno));
+            exit(2);
+        }
+        remplissage(head->next);
+        head->next->next=NULL;
+        return;
+    } 
+    remplissage(head);
+    head->next=NULL;
 }
 
 void affichage(EMPLOYE *node){
