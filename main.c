@@ -9,6 +9,8 @@
 #include <stddef.h>
 
 #include <curses.h>
+#include <form.h>
+#include <menu.h>
 #include <sys/ioctl.h>
 
 #include <locale.h>
@@ -49,7 +51,7 @@ void fill_employee(EMPLOYEE *A) {
   scanf("%d", &A->mat);
 
   printf("\n\tSalaire brute:\n");
-  scanf("%d", &A->sal_Brute);
+  scanf("%d", &A->salary);
 
   printf("\n\tCode Region:\n");
   scanf("%d", &A->region.code_region);
@@ -81,26 +83,25 @@ void modification(int index) {
   char *buffer = NULL;
   buffer = (char *)malloc(100 * sizeof(char));
   check_alloc(buffer);
+
   // cycling through the list to get to what we want to modify
+  EMPLOYEE *cur = head;
   for (; index != 0; index--) {
-    head = head->next;
+    cur = cur->next;
   }
 
-// Instead of a long while loop, I opted for a goto when the modifications are
-// all done :) it just looks better in my opinion but idk optimization wise I
-// still gotta check later but it's probably the same
 START:
   printf("Choisissez quelles valeurs voulez-vous changer:\n");
   printf("1 - Nom: %s\n", head->namef);
   printf("2 - Prenom: %s\n", head->namel);
   printf("3 - Matricule: %d\n", head->mat);
-  printf("4 - Salaire Brute: %d\n", head->sal_Brute);
+  printf("4 - Salaire Brute: %d\n", head->salary);
   printf("5 - Code Region: %d\n", head->region.code_region);
   printf("6 - Taux: %d\n", head->region.taux);
   printf("0 - Revenir au menu\n");
 
   printf("\n\nChoix: ");
-  while (scanf("%d", &choice) != 1 || choice > 6 || choice < 0) {
+  while (choice > 6 || choice < 0) {
     fprintf(stderr, "Wrong input\n");
     goto START;
   }
@@ -137,7 +138,7 @@ START:
 
   case 4:
     printf("\t\tMatricule: ");
-    scanf("%d", &head->sal_Brute);
+    scanf("%d", &head->salary);
     goto MESSAGE_SUCCESS;
 
   case 5:
@@ -198,7 +199,7 @@ void suppression(EMPLOYEE *head, int n) {
 
 void recherche(void) {
   int choice;
-RECH:
+SEARCH:
   system("clear");
   puts("Chercher par:"
        "\t1-Matricule"
@@ -217,31 +218,24 @@ RECH:
   switch (choice) {
   case 1:
     printf("Matricule: ");
-    while (scanf("%d", Mat) != 1) {
-      printf("Matricule: ");
-    }
+    scanf("%d", Mat);
     while (!(head->mat == *Mat)) {
       head = head->next;
     }
     if (!(head == NULL)) {
       show_employee(head);
-      printf("Tapez entrer pour continuer");
+      printf("Press enter to continue");
       getchar();
       system("clear");
-      goto FREE;
+      goto SEARCH_FREE;
     } else {
-      printf("Aucun employe trouve avec la matricule entree.\n"
-             "Tapez entrer pour continuer");
+      fprintf(stderr, "Aucun employe trouve avec la matricule entree.\n"
+                      "Tapez entrer pour continuer");
       getchar();
       system("clear");
-      goto FREE;
+      goto SEARCH_FREE;
     }
   case 2:
-    if (Nom == NULL) {
-      fprintf(stderr, "Error value: %d\n", errno);
-      fprintf(stderr, "%s\n", strerror(errno));
-      exit(2);
-    }
     printf("Nom: ");
     while (fgets(head->namef, sizeof(head->namef), stdin) == NULL) {
       printf("Nom: ");
@@ -253,27 +247,29 @@ RECH:
       show_employee(head);
       printf("Tapez entrer pour continuer");
       getchar();
-      goto FREE;
+      goto SEARCH_FREE;
     } else {
       puts("Aucun employe trouve avec le nom entre.\n"
            "Tapez entrer pour continuer\n");
       getchar();
-      goto FREE;
+      goto SEARCH_FREE;
     }
   case 0:
     printf("Press enter to go back to menu. ");
     getchar();
     return;
   }
-FREE:
+SEARCH_FREE:
   free(Mat);
   free(Nom);
-  goto RECH;
+  goto SEARCH;
 }
 
 int main(int argc, char *argv[]) {
 
   setlocale(LC_ALL, "");
+
+  initscr();
 
   EMPLOYEE *head = NULL;
   head = (EMPLOYEE *)malloc(sizeof(EMPLOYEE));
@@ -299,7 +295,8 @@ int main(int argc, char *argv[]) {
          "4 - Search employee\n"
          "5 - Quit\n");
     printf("Choice: ");
-    while (!scanf("%d", &choice) || choice > 5 || choice < 1) {
+    scanf("%d", &choice);
+    while (choice > 5 || choice < 1) {
       printf("Choice: ");
     }
 

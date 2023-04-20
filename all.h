@@ -7,7 +7,7 @@ typedef struct EMPLOYEE EMPLOYEE;
 
 struct EMPLOYEE {
   int mat;
-  int sal_Brute;
+  int salary;
   char *namef;
   char *namel;
   struct {
