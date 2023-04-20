@@ -1,5 +1,5 @@
 OBJECTS = main.o utils.o employee.o disk.o
-CFLAGS = -Og -ggdb
+CFLAGS = -std=c11 -Wall -Wextra -pedantic -Og -ggdb
 
 all: $(OBJECTS)
 	cc $(CFLAGS) -o a.out $(OBJECTS) 
