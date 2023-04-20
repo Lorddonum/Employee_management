@@ -8,4 +8,4 @@ all: $(OBJECTS)
 	cc $(CFLAGS) -c -o $@ $<
 
 clean:
-	rm -f $(OBJECTS)
+	rm -f $(OBJECTS) *.out
