@@ -1,11 +1,12 @@
-OBJECTS = main.o utils.o employee.o disk.o
+OBJECTS = src/main.o src/utils.o src/employee.o src/disk.o src/graphx.o
 CFLAGS = -std=c11 -Wall -Wextra -pedantic -Og -ggdb
+LDFLAGS = -lncurses
 
 all: $(OBJECTS)
-	cc $(CFLAGS) -o a.out $(OBJECTS) 
+	cc $(CFLAGS) -o emp.out $(OBJECTS) $(LDFLAGS)
 
 .c.o:
 	cc $(CFLAGS) -c -o $@ $<
 
 clean:
-	rm -f $(OBJECTS) *.out
+	rm -f $(OBJECTS) *.out *.plist */**.gch
