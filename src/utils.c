@@ -1,3 +1,4 @@
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -10,7 +11,7 @@
 
 #include "all.h"
 
-/* check if a pointer contains memory and exits if NULL */
+/* check the success of allocation with exit on failure */
 void check_alloc(void *ptr) {
   if (ptr == NULL) {
     fprintf(stderr, "Error value: %d\n", errno);
@@ -23,7 +24,7 @@ void check_alloc(void *ptr) {
 int check_string(char *buffer) {
   for (size_t index = 0; index < strlen(buffer); index++) {
     if (!isalpha(buffer[index]))
-      return 1;
+      return true;
   }
-  return 0;
+  return false;
 }

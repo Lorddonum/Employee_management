@@ -16,10 +16,10 @@ EMPLOYEE *create_employee(void) {
 }
 
 /* frees employee fields */
-void destruct_employee(EMPLOYEE *yeet) {
-  free(yeet->namel);
-  free(yeet->namef);
-  free(yeet);
+void destruct_employee(EMPLOYEE *deleted) {
+  free(deleted->namel);
+  free(deleted->namef);
+  free(deleted);
 }
 
 /* prints all employee fields */
