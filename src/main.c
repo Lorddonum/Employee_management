@@ -103,6 +103,7 @@ int main(int argc, char *argv[]) {
       break;
 
     case 'q':
+      qflag = 1;
       break;
 
     case 'c':
@@ -119,6 +120,7 @@ int main(int argc, char *argv[]) {
       exit(EXIT_SUCCESS);
 
     case 'v':
+      vflag = 1;
       break;
 
     case '?':
