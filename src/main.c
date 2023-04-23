@@ -14,7 +14,9 @@
 #include <menu.h>
 #include <sys/ioctl.h>
 
+#ifdef __GNUC__
 #include <getopt.h>
+#endif
 #include <locale.h>
 #include <unistd.h>
 
@@ -52,10 +54,10 @@ int main(int argc, char *argv[]) {
     color = true;
   }
 
-// TODO: setup fallback to short args parsing when getopt_long is not available
-#if 0
+// fallback to short args parsing when getopt_long is not available
+#if !defined(__GNUC__)
   int opt;
-  while ((opt = getopt(argc, argv, "hcdp:")) != -1) {
+  while ((opt = getopt(argc, argv, "hcqsvp:")) != -1) {
     switch (opt) {
     case 'c':
       color = true;
@@ -65,6 +67,15 @@ int main(int argc, char *argv[]) {
       path_to_disk_state = optarg;
       fprintf(stderr, "Info: given path is %s\n", optarg);
       break;
+    case 'q':
+      qflag = 1;
+      break;
+    case 'v':
+      vflag = 1;
+      break;
+    case 's':
+      sflag = 0;
+      break;
     case 'h':
       usage();
       exit(EXIT_SUCCESS);
@@ -73,8 +84,7 @@ int main(int argc, char *argv[]) {
       exit(EXIT_FAILURE);
     }
   }
-#endif
-
+#else
   int opt;
   while (1) {
     static struct option long_options[] = {
@@ -137,6 +147,7 @@ int main(int argc, char *argv[]) {
       abort();
     }
   }
+#endif
 
   vflag &= !qflag;
   cflag |= color;
@@ -173,6 +184,7 @@ int main(int argc, char *argv[]) {
   raw();
   // enables function keys F1-F12, arrow keys, etc...
   keypad(stdscr, TRUE);
+  init_pair(1, COLOR_RED, COLOR_BLACK);
   // disables echoing by getch
   noecho();
 
@@ -185,10 +197,43 @@ int main(int argc, char *argv[]) {
       "0 - Quit",
   };
 
+  // use the window's size in all further calculation of positions
   struct winsize w;
   ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
-  WINDOW *main_menu = newwin(10, 40, 4, 4);
-  keypad(main_menu, TRUE);
+  // WINDOW *main_menu = newwin(10, 40, 4, 4);
+  // keypad(main_menu, TRUE);
+
+  ITEM **main_items;
+  int c;
+  MENU *main_menu;
+  WINDOW *main_menu_win;
+  int n_choices;
+
+  initscr();
+  start_color();
+  cbreak();
+  noecho();
+  keypad(stdscr, TRUE);
+  init_pair(1, COLOR_RED, COLOR_BLACK);
+  n_choices = ARRAY_SIZE(choices_main);
+  main_items = (ITEM **)calloc(n_choices, sizeof(ITEM *));
+  for (int i = 0; i < n_choices; ++i) {
+    main_items[i] = new_item(choices_main[i], choices_main[i]);
+  }
+
+  /* Crate menu */
+  main_menu = new_menu((ITEM **)main_items);
+
+  /* Create the window to be associated with the menu */
+  main_menu_win = newwin(10, 40, 4, 4);
+  keypad(main_menu_win, TRUE);
+
+  /* Set main window and sub window */
+  set_menu_win(main_menu, main_menu_win);
+  set_menu_sub(main_menu_win, derwin(main_menu_win, 6, 38, 3, 1));
+
+  /* Set menu mark to the string " * " */
+  set_menu_mark(main_menu_win, " * ");
 
   // test program
 #if 0

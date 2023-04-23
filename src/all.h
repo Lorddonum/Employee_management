@@ -16,6 +16,10 @@
 #define CTRL_U 21
 #define CTRL_D 4
 
+// macros
+
+#define ARRAY_SIZE(a) (sizeof a / sizeof a[0])
+
 // type declarations
 
 typedef struct EMPLOYEE EMPLOYEE;
