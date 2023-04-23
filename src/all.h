@@ -13,6 +13,8 @@
 #else
 #include <sys/syslimits.h>
 #endif
+#define CTRL_U 21
+#define CTRL_D 4
 
 // type declarations
 
@@ -37,6 +39,7 @@ int check_string(char *buffer);
 // NOTE: graphical views / routines see "graphx.c"
 void print_in_middle(WINDOW *win, int starty, int startx, int width,
                      char *string, chtype color);
+char *intprtkey(int ch);
 
 // NOTE: employee base functions see "employee.c"
 EMPLOYEE *create_employee(void);

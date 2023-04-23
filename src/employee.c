@@ -2,7 +2,7 @@
 
 extern EMPLOYEE *head;
 
-/* allocates an employee object */
+/// allocates an employee object
 EMPLOYEE *create_employee(void) {
   EMPLOYEE *local = NULL;
   local = (EMPLOYEE *)malloc(sizeof(EMPLOYEE));
@@ -15,14 +15,14 @@ EMPLOYEE *create_employee(void) {
   return local;
 }
 
-/* frees employee fields */
+/// frees employee fields
 void destruct_employee(EMPLOYEE *deleted) {
   free(deleted->namel);
   free(deleted->namef);
   free(deleted);
 }
 
-/* prints all employee fields */
+/// prints all employee fields
 void show_employee(EMPLOYEE *node) {
   printf("Nom:           %s\n", node->namef);
   printf("Prenom:        %s\n", node->namel);

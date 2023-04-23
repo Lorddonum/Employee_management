@@ -26,8 +26,6 @@ EMPLOYEE *head = NULL;
 FILE *disk_state = NULL;
 char *path_to_disk_state = NULL;
 
-char *intprtkey(int ch);
-
 extern char *__progname;
 
 static inline void usage(void);
@@ -35,13 +33,14 @@ static inline void usage(void);
 extern char *optarg;
 extern int optind, opterr, optopt;
 
-int vflag, qflag, cflag;
+int vflag, qflag, cflag, sflag;
 
 int main(int argc, char *argv[]) {
 
   // flag/global vars initializers
-  vflag = 0, qflag = 0; /* remaining off => a quieter program */
-  cflag = 0;            /* remaining off => there will be colors */
+  vflag = 0, qflag = 0; /* default off => a quieter program    */
+  cflag = 0;            /* default off => there will be colors */
+  sflag = 1;            /* default on => sync state with disk  */
 
   path_to_disk_state = (char *)malloc(sizeof(char) * PATH_MAX);
 
@@ -75,15 +74,17 @@ int main(int argc, char *argv[]) {
     }
   }
 #endif
-  int opt;
 
+  int opt;
   while (1) {
-    static struct option long_options[5] = {
+    static struct option long_options[] = {
         {"quiet", no_argument, &qflag, 'q'},
         {"help", no_argument, 0, 'h'},
         {"no-color", no_argument, 0, 'c'},
         {"path", required_argument, 0, 'p'},
+        {"stateless", no_argument, 0, 's'},
         {"verbose", no_argument, &vflag, 'v'},
+        {0, 0, 0, 0},
     };
 
     int option_index = 0;
@@ -113,6 +114,10 @@ int main(int argc, char *argv[]) {
     case 'p':
       path_to_disk_state = optarg;
       fprintf(stderr, "Info: given path to state file is %s\n", optarg);
+      break;
+
+    case 's':
+      sflag = 0;
       break;
 
     case 'h':
@@ -147,8 +152,6 @@ int main(int argc, char *argv[]) {
     putchar('\n');
   }
 
-  // ncurses init
-
   initlist();
 
   setlocale(LC_ALL, "");
@@ -160,10 +163,17 @@ int main(int argc, char *argv[]) {
     exit(EXIT_FAILURE);
   }
 
+  // only enables color if NO_COLOR is unset and no -c / --no-color is passed
   if (!cflag)
     start_color();
+  /*
+   * we exercise complete control over all the input of the program
+   * including control sequences, ex: Ctrl+C, Ctrl+D, etc...
+   */
   raw();
+  // enables function keys F1-F12, arrow keys, etc...
   keypad(stdscr, TRUE);
+  // disables echoing by getch
   noecho();
 
   // TODO: add main menu
@@ -179,6 +189,18 @@ int main(int argc, char *argv[]) {
   ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
   WINDOW *main_menu = newwin(10, 40, 4, 4);
   keypad(main_menu, TRUE);
+
+  // test program
+#if 0
+  int ch;
+  ch = getch();
+  printw("The pressed key is ");
+  attron(A_BOLD);
+  printw("%c", ch);
+  attroff(A_BOLD);
+  refresh();
+  getch();
+#endif
 
   // TODO: add search menu
   char *choices_search[3] = {
@@ -203,6 +225,7 @@ static inline void usage(void) {
           "\t-v, --verbose        enable verbose logging\n"
           "\t-q, --quiet          disable verbose logging\n"
           "\t-p, --path PATH      specify path of the state file\n"
+          "\t-s, --stateless      disable use of a state file\n"
           "\t-h, --help           prints out this help\n",
           __progname, __progname);
 }

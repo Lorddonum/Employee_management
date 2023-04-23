@@ -2,7 +2,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <string.h>
 #include <sys/stat.h>
+#include <unistd.h>
+
+#include <err.h>
+#include <errno.h>
 
 #include "all.h"
 
@@ -10,9 +15,18 @@ extern FILE *disk_state;
 extern EMPLOYEE *head;
 extern char *path_to_disk_state;
 
+/// open a path to a disk file and returns a reference to it
 FILE *cache_disk_file(char *path) {
   struct stat info;
   stat(path, &info);
+
+  if (access(path, (R_OK & W_OK)) == -1) {
+    fprintf(stderr,
+            "Error: can't access the state file\n"
+            "%s",
+            strerror(errno));
+    exit(0);
+  }
 
   if (info.st_size == 0) {
     fprintf(stderr, "Warn: state file is empty\n");
@@ -28,6 +42,7 @@ FILE *cache_disk_file(char *path) {
   return cache;
 }
 
+/// incrementally parses a csv file into EMPLOYEE fields
 int parse_file_to_list(FILE *state) {
   EMPLOYEE *cur = head = create_employee();
   char *buffer = NULL;
@@ -42,6 +57,7 @@ int parse_file_to_list(FILE *state) {
   return 0;
 }
 
+/// initialize the EMPLOYEE linked list at global head
 int initlist(void) {
 
   if (head != NULL) {

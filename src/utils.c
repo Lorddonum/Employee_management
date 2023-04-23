@@ -11,7 +11,7 @@
 
 #include "all.h"
 
-/* check the success of allocation with exit on failure */
+/// check the success of allocation with exit on failure
 void check_alloc(void *ptr) {
   if (ptr == NULL) {
     fprintf(stderr, "Error value: %d\n", errno);
@@ -20,7 +20,7 @@ void check_alloc(void *ptr) {
   }
 }
 
-/* checks if a string is made of letters only */
+/// checks if a string is made of letters only
 int check_string(char *buffer) {
   for (size_t index = 0; index < strlen(buffer); index++) {
     if (!isalpha(buffer[index]))
