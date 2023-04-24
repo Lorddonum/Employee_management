@@ -1,6 +1,6 @@
 OBJECTS = src/main.o src/utils.o src/employee.o src/disk.o src/graphx.o
 CFLAGS = -std=c11 -Wall -Wextra -pedantic -Og -ggdb
-LDFLAGS = -lncurses
+LDFLAGS = -lncurses -lmenu -lform
 
 all: $(OBJECTS)
 	cc $(CFLAGS) -o emp.out $(OBJECTS) $(LDFLAGS)
