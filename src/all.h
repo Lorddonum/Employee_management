@@ -18,7 +18,10 @@
 
 // macros
 
+// NOTE: only works on static arrays (no vla)
 #define ARRAY_SIZE(a) (sizeof a / sizeof a[0])
+// TODO: extract all the windows dimesniosn from ioctl's window size
+#define GLOBAL_CORDS(a)
 
 // type declarations
 

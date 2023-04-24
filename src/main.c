@@ -12,10 +12,17 @@
 #include <curses.h>
 #include <form.h>
 #include <menu.h>
+#ifdef __unix
 #include <sys/ioctl.h>
+#elif defined(_WIN32) || defined(WIN32)
+#include <winioctl.h>
+#endif
 
 #ifdef __GNUC__
 #include <getopt.h>
+#endif
+#if defined(_WIN32) || defined(WIN32)
+#include <windows.h>
 #endif
 #include <locale.h>
 #include <unistd.h>
@@ -207,7 +214,7 @@ int main(int argc, char *argv[]) {
   int c;
   MENU *main_menu;
   WINDOW *main_menu_win;
-  int n_choices;
+  int main_choices_count;
 
   initscr();
   start_color();
@@ -215,9 +222,9 @@ int main(int argc, char *argv[]) {
   noecho();
   keypad(stdscr, TRUE);
   init_pair(1, COLOR_RED, COLOR_BLACK);
-  n_choices = ARRAY_SIZE(choices_main);
-  main_items = (ITEM **)calloc(n_choices, sizeof(ITEM *));
-  for (int i = 0; i < n_choices; ++i) {
+  main_choices_count = ARRAY_SIZE(choices_main);
+  main_items = (ITEM **)calloc(main_choices_count, sizeof(ITEM *));
+  for (int i = 0; i < main_choices_count; ++i) {
     main_items[i] = new_item(choices_main[i], choices_main[i]);
   }
 
@@ -230,22 +237,33 @@ int main(int argc, char *argv[]) {
 
   /* Set main window and sub window */
   set_menu_win(main_menu, main_menu_win);
-  set_menu_sub(main_menu_win, derwin(main_menu_win, 6, 38, 3, 1));
+  set_menu_sub(main_menu, derwin(main_menu_win, 6, 38, 3, 1));
 
   /* Set menu mark to the string " * " */
-  set_menu_mark(main_menu_win, " * ");
+  set_menu_mark(main_menu, " * ");
 
-  // test program
-#if 0
-  int ch;
-  ch = getch();
-  printw("The pressed key is ");
-  attron(A_BOLD);
-  printw("%c", ch);
-  attroff(A_BOLD);
+  box(main_menu_win, 0, 0);
+  print_in_middle(main_menu_win, 1, 0, 40, "Main Menu", COLOR_PAIR(1));
+  mvwaddch(main_menu_win, 2, 0, ACS_LTEE);
+  mvwhline(main_menu_win, 2, 1, ACS_HLINE, 38);
+  mvwaddch(main_menu_win, 2, 39, ACS_RTEE);
+  mvprintw(LINES - 2, 0, "F1 to exit");
   refresh();
-  getch();
-#endif
+
+  post_menu(main_menu);
+  wrefresh(main_menu_win);
+
+  while ((c = wgetch(main_menu_win)) != KEY_F(1)) {
+    switch (c) {
+    case KEY_DOWN:
+      menu_driver(main_menu, REQ_DOWN_ITEM);
+      break;
+    case KEY_UP:
+      menu_driver(main_menu, REQ_UP_ITEM);
+      break;
+    }
+    wrefresh(main_menu_win);
+  }
 
   // TODO: add search menu
   char *choices_search[3] = {
@@ -253,6 +271,15 @@ int main(int argc, char *argv[]) {
       "2 - By Name",
       "3 - Go back to main menu",
   };
+
+UNCURSE_EM:
+
+UNCURSE_MM:
+  unpost_menu(main_menu);
+  free_menu(main_menu);
+  for (int i = 0; i < main_choices_count; i++) {
+    free_item(main_items[i]);
+  }
 
 UNCURSE:
   delwin(mainwind);
