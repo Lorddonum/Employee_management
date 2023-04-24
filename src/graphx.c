@@ -105,3 +105,18 @@ void win_show(WINDOW *win, char *label, int label_color) {
 }
 
 char *intprtkey(int ch);
+
+void handlekeys(WINDOW *main_menu_win, MENU *main_menu) {
+  int c;
+  while ((c = wgetch(main_menu_win)) != KEY_F(1)) {
+    switch (c) {
+    case KEY_DOWN:
+      menu_driver(main_menu, REQ_DOWN_ITEM);
+      break;
+    case KEY_UP:
+      menu_driver(main_menu, REQ_UP_ITEM);
+      break;
+    }
+    wrefresh(main_menu_win);
+  }
+}

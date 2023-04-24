@@ -55,3 +55,5 @@ void show_employee(EMPLOYEE *node);
 
 // NOTE: disk <=> memory interchange see "disk.c"
 int initlist(void);
+
+// vim: ft=c

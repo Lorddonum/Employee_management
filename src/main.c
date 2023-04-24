@@ -9,12 +9,14 @@
 #include <errno.h>
 #include <stddef.h>
 
+#ifdef __unix
 #include <curses.h>
 #include <form.h>
 #include <menu.h>
-#ifdef __unix
-#include <sys/ioctl.h>
 #elif defined(_WIN32) || defined(WIN32)
+#include <ncurses/form.h>
+#include <ncurses/menu.h>
+#include <ncurses/ncurses.h>
 #include <winioctl.h>
 #endif
 
@@ -156,6 +158,9 @@ int main(int argc, char *argv[]) {
   }
 #endif
 
+  if (path_to_disk_state[0] == '\0')
+    path_to_disk_state = "state/record.txt";
+
   vflag &= !qflag;
   cflag |= color;
 
@@ -177,7 +182,7 @@ int main(int argc, char *argv[]) {
   WINDOW *mainwind;
 
   if ((mainwind = initscr()) == NULL) {
-    fprintf(stderr, "Error initializing ncurses.\n");
+    fprintf(stderr, "Error: failed to initialize ncurses.\n");
     exit(EXIT_FAILURE);
   }
 
@@ -204,22 +209,21 @@ int main(int argc, char *argv[]) {
       "0 - Quit",
   };
 
-  // use the window's size in all further calculation of positions
-  struct winsize w;
-  ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
-  // WINDOW *main_menu = newwin(10, 40, 4, 4);
-  // keypad(main_menu, TRUE);
+  // TODO: use the window's size in all further calculation of positions
+  int row, col;
+  getmaxyx(stdscr, row, col);
+  char *mesg = NULL;
+  mesg = (char *)malloc(sizeof(char) * 100);
+  mesg = "Welcome";
+  mvprintw(row / 2, (col - strlen(mesg)) / 2, "%s", mesg);
+  if (vflag == 1)
+    mvprintw(row - 2, 0, "This screen has %d rows and %d columns\n", row, col);
 
   ITEM **main_items;
-  int c;
   MENU *main_menu;
   WINDOW *main_menu_win;
   int main_choices_count;
 
-  initscr();
-  start_color();
-  cbreak();
-  noecho();
   keypad(stdscr, TRUE);
   init_pair(1, COLOR_RED, COLOR_BLACK);
   main_choices_count = ARRAY_SIZE(choices_main);
@@ -253,6 +257,7 @@ int main(int argc, char *argv[]) {
   post_menu(main_menu);
   wrefresh(main_menu_win);
 
+  int c;
   while ((c = wgetch(main_menu_win)) != KEY_F(1)) {
     switch (c) {
     case KEY_DOWN:
