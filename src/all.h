@@ -1,4 +1,5 @@
 #include <curses.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -27,6 +28,7 @@
 
 typedef struct EMPLOYEE EMPLOYEE;
 
+/// Employee linked list node type
 struct EMPLOYEE {
   int mat;
   int salary;
@@ -38,6 +40,12 @@ struct EMPLOYEE {
   } region;
   EMPLOYEE *next;
 };
+
+/// global terminal size in a struct
+typedef struct {
+  size_t col;
+  size_t wid;
+} term_state;
 
 // NOTE: utility functions see "utils.c"
 void check_alloc(void *ptr);
@@ -54,6 +62,6 @@ void destruct_employee(EMPLOYEE *poor_soul);
 void show_employee(EMPLOYEE *node);
 
 // NOTE: disk <=> memory interchange see "disk.c"
-int initlist(void);
+void initlist(void);
 
 // vim: ft=c

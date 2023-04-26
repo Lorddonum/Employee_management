@@ -8,5 +8,7 @@ all: $(OBJECTS)
 .c.o:
 	cc $(CFLAGS) -c -o $@ $<
 
+run: all
+	./emp.out
 clean:
 	rm -f $(OBJECTS) *.out *.plist */**.gch

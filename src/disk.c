@@ -1,4 +1,5 @@
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -14,6 +15,7 @@
 extern FILE *disk_state;
 extern EMPLOYEE *head;
 extern char *path_to_disk_state;
+extern int vflag, qflag, cflag, sflag;
 
 /// open a path to a disk file and returns a reference to it
 FILE *cache_disk_file(char *path) {
@@ -29,7 +31,8 @@ FILE *cache_disk_file(char *path) {
   }
 
   if (info.st_size == 0) {
-    fprintf(stderr, "Warn: state file is empty\n");
+    if (vflag)
+      fprintf(stderr, "Warn: state file is empty\n");
   }
 
   FILE *cache = NULL;
@@ -46,33 +49,44 @@ FILE *cache_disk_file(char *path) {
 int parse_file_to_list(FILE *state) {
   EMPLOYEE *cur = head = create_employee();
   char *buffer = NULL;
-  buffer = malloc(sizeof(char) * 100);
+  buffer = (char *)malloc(sizeof(char) * 100);
   check_alloc(buffer);
+  size_t field_count = 0;
   while (fgets(buffer, sizeof(buffer), state) != NULL) {
+    field_count++;
     cur->next = create_employee();
     sscanf(buffer, "%d, %s, %s, %d, %d, %d", &cur->mat, cur->namef, cur->namel,
            &cur->region.code_region, &cur->region.taux, &cur->salary);
     cur = cur->next;
   }
+  if (vflag)
+    fprintf(stderr, "Info: initialized head with %ld", field_count);
+
+  free(buffer);
   return 0;
 }
 
 /// initialize the EMPLOYEE linked list at global head
-int initlist(void) {
+void initlist(void) {
 
   if (head != NULL) {
     fprintf(stderr, "Error: trying to initialize a non-empty list\n");
     exit(EXIT_FAILURE);
   }
 
-  if (path_to_disk_state == NULL) {
-    fputs("no file specificed for long term storage\n"
-          "defaulting to state.txt\n",
-          stderr);
+  if (sflag) {
+    if (path_to_disk_state == NULL) {
+      fputs("Error: no file specificed for long term storage\n", stderr);
+      exit(EXIT_FAILURE);
+    }
+    FILE *cache = cache_disk_file(path_to_disk_state);
+    parse_file_to_list(cache);
+    return;
   }
 
-  FILE *cache = cache_disk_file(path_to_disk_state);
-  parse_file_to_list(cache);
+  head = create_employee();
+  if (vflag)
+    fprintf(stderr, "Info: initialized empty head");
 
-  return 0;
+  return;
 }

@@ -36,6 +36,7 @@ extern int errno;
 EMPLOYEE *head = NULL;
 FILE *disk_state = NULL;
 char *path_to_disk_state = NULL;
+term_state *term = NULL;
 
 extern char *__progname;
 
@@ -57,10 +58,10 @@ int main(int argc, char *argv[]) {
 
   // env vars parsing
   char *no_color = getenv("NO_COLOR");
-  bool color = false;
+  int color = 0;
 
   if (no_color != NULL && no_color[0] != '\0') {
-    color = true;
+    color = 1;
   }
 
 // fallback to short args parsing when getopt_long is not available
@@ -127,7 +128,7 @@ int main(int argc, char *argv[]) {
       break;
 
     case 'c':
-      cflag = 1;
+      cflag = 0;
       break;
 
     case 'p':
@@ -158,14 +159,23 @@ int main(int argc, char *argv[]) {
   }
 #endif
 
+  // defaults to "state/record.txt"
   if (path_to_disk_state[0] == '\0')
     path_to_disk_state = "state/record.txt";
 
   vflag &= !qflag;
   cflag |= color;
 
-  if (vflag)
+  // general loging
+  if (vflag) {
     fprintf(stderr, "Info: verbose mode is on\n");
+    if (cflag)
+      fprintf(stderr, "Info: color mode is on");
+    if (!sflag)
+      fprintf(stderr, "Info: state file at '%s'", path_to_disk_state);
+    else
+      fprintf(stderr, "Info: saving state to disk is disabled");
+  }
 
   // warn on extraneous args
   if (optind < argc) {
@@ -174,6 +184,9 @@ int main(int argc, char *argv[]) {
       printf("%s ", argv[optind++]);
     putchar('\n');
   }
+  //------------------------------------------------------------------//
+  //               Initializing curses && EMPLOYEE list               //
+  //------------------------------------------------------------------//
 
   initlist();
 
@@ -200,6 +213,18 @@ int main(int argc, char *argv[]) {
   // disables echoing by getch
   noecho();
 
+  // TODO: use the window's size in all further calculation of positions
+  int row, col;
+  getmaxyx(stdscr, row, col);
+  char mesg[] = "Welcome";
+  mvprintw(row / 2, (col - (int)strlen(mesg)) / 2, "%s", mesg);
+  if (vflag == 1)
+    mvprintw(row - 2, 0, "This screen has %d rows and %d columns\n", row, col);
+
+  //------------------------------------------------------------------//
+  //                         main menu logic                          //
+  //------------------------------------------------------------------//
+
   // TODO: add main menu
   char *choices_main[5] = {
       "1 - Adding employee record",
@@ -209,26 +234,16 @@ int main(int argc, char *argv[]) {
       "0 - Quit",
   };
 
-  // TODO: use the window's size in all further calculation of positions
-  int row, col;
-  getmaxyx(stdscr, row, col);
-  char *mesg = NULL;
-  mesg = (char *)malloc(sizeof(char) * 100);
-  mesg = "Welcome";
-  mvprintw(row / 2, (col - strlen(mesg)) / 2, "%s", mesg);
-  if (vflag == 1)
-    mvprintw(row - 2, 0, "This screen has %d rows and %d columns\n", row, col);
-
   ITEM **main_items;
   MENU *main_menu;
   WINDOW *main_menu_win;
-  int main_choices_count;
+  size_t main_choices_count;
 
   keypad(stdscr, TRUE);
   init_pair(1, COLOR_RED, COLOR_BLACK);
   main_choices_count = ARRAY_SIZE(choices_main);
   main_items = (ITEM **)calloc(main_choices_count, sizeof(ITEM *));
-  for (int i = 0; i < main_choices_count; ++i) {
+  for (size_t i = 0; i < main_choices_count; ++i) {
     main_items[i] = new_item(choices_main[i], choices_main[i]);
   }
 
@@ -269,6 +284,9 @@ int main(int argc, char *argv[]) {
     }
     wrefresh(main_menu_win);
   }
+  //------------------------------------------------------------------//
+  //                        search menu logic                         //
+  //------------------------------------------------------------------//
 
   // TODO: add search menu
   char *choices_search[3] = {
@@ -277,16 +295,14 @@ int main(int argc, char *argv[]) {
       "3 - Go back to main menu",
   };
 
-UNCURSE_EM:
+UNCURSE:
 
-UNCURSE_MM:
   unpost_menu(main_menu);
   free_menu(main_menu);
-  for (int i = 0; i < main_choices_count; i++) {
+  for (size_t i = 0; i < main_choices_count; i++) {
     free_item(main_items[i]);
   }
 
-UNCURSE:
   delwin(mainwind);
   endwin();
   refresh();
