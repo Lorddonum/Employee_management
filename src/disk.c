@@ -12,13 +12,11 @@
 
 #include "all.h"
 
-extern FILE *disk_state;
 extern EMPLOYEE *head;
-extern char *path_to_disk_state;
 extern int vflag, qflag, cflag, sflag;
 
 /// open a path to a disk file and returns a reference to it
-FILE *cache_disk_file(char *path) {
+FILE *cache_disk_file(const char *path) {
   struct stat info;
   stat(path, &info);
 
@@ -67,7 +65,7 @@ int parse_file_to_list(FILE *state) {
 }
 
 /// initialize the EMPLOYEE linked list at global head
-void initlist(void) {
+void initlist(const char *path_to_disk_state) {
 
   if (head != NULL) {
     fprintf(stderr, "Error: trying to initialize a non-empty list\n");

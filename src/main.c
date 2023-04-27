@@ -34,8 +34,6 @@
 extern int errno;
 
 EMPLOYEE *head = NULL;
-FILE *disk_state = NULL;
-char *path_to_disk_state = NULL;
 term_state *term = NULL;
 
 extern char *__progname;
@@ -55,8 +53,12 @@ int main(int argc, char *argv[]) {
   sflag = 1;            /* default on => sync state with disk  */
   lflag = 0;            /* default off => no redirect of stderr */
 
-  path_to_disk_state = (char *)malloc(sizeof(char) * PATH_MAX);
-  char *path_to_log_file = (char *)malloc(sizeof(char) * PATH_MAX);
+  char *path_to_disk_state =
+      (char *)calloc(sizeof(char) * PATH_MAX, sizeof(char));
+  check_alloc(path_to_disk_state);
+  char *path_to_log_file =
+      (char *)calloc(sizeof(char) * PATH_MAX, sizeof(char));
+  check_alloc(path_to_log_file);
 
   // env vars parsing
   char *no_color = getenv("NO_COLOR");
@@ -208,16 +210,11 @@ int main(int argc, char *argv[]) {
   //               Initializing curses && EMPLOYEE list               //
   //------------------------------------------------------------------//
 
-  initlist();
+  initlist(path_to_disk_state);
 
   setlocale(LC_ALL, "");
 
-  WINDOW *mainwind;
-
-  if ((mainwind = initscr()) == NULL) {
-    fprintf(stderr, "Error: failed to initialize ncurses.\n");
-    exit(EXIT_FAILURE);
-  }
+  WINDOW *mainwind = initscr();
 
   // only enables color if NO_COLOR is unset and no -c / --no-color is passed
   if (!cflag)
@@ -252,11 +249,11 @@ int main(int argc, char *argv[]) {
 
   // TODO: add main menu
   const char *choices_main[5] = {
-      "1 - Adding employee record",
-      "2 - Delete employee record",
-      "3 - Modify employee field ",
-      "4 - Search for employee by field",
-      "0 - Quit",
+      "Adding employee record",
+      "Delete employee record",
+      "Modify employee field ",
+      "Search for employee by field",
+      "Quit",
   };
 
   ITEM **main_items;
@@ -272,8 +269,8 @@ int main(int argc, char *argv[]) {
     main_items[i] = new_item(choices_main[i], choices_main[i]);
   }
 
-  /* Crate menu */
-  main_menu = new_menu((ITEM **)main_items);
+  /* Create menu */
+  main_menu = new_menu(main_items);
 
   /* Create the window to be associated with the menu */
   main_menu_win = newwin(10, 40, 4, 4);
@@ -287,7 +284,7 @@ int main(int argc, char *argv[]) {
   set_menu_mark(main_menu, " * ");
 
   box(main_menu_win, 0, 0);
-  print_in_middle(main_menu_win, "Main Menu", COLOR_PAIR(1));
+  // print_in_middle(main_menu_win, "Main Menu", COLOR_PAIR(1));
   mvwaddch(main_menu_win, 2, 0, ACS_LTEE);
   mvwhline(main_menu_win, 2, 1, ACS_HLINE, 38);
   mvwaddch(main_menu_win, 2, 39, ACS_RTEE);

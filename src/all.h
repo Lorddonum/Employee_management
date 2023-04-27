@@ -66,6 +66,6 @@ void destruct_employee(EMPLOYEE *poor_soul);
 void show_employee(EMPLOYEE *node);
 
 // NOTE: disk <=> memory interchange see "disk.c"
-void initlist(void);
+void initlist(const char* path_to_disk_state);
 
 // vim: ft=c
