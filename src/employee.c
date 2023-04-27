@@ -24,10 +24,10 @@ void destruct_employee(EMPLOYEE *deleted) {
 
 /// prints all employee fields
 void show_employee(EMPLOYEE *node) {
-  printf("Nom:           %s\n", node->namef);
-  printf("Prenom:        %s\n", node->namel);
-  printf("Matricule:     %d\n", node->mat);
-  printf("Salaire brute: %d\n", node->salary);
-  printf("Code region:   %d\n", node->region.code_region);
-  printf("Taux:          %d\n", node->region.taux);
+  printf("First Name:           %s\n", node->namef);
+  printf("Last Name:            %s\n", node->namel);
+  printf("Identifier:           %d\n", node->mat);
+  printf("Salary:               %d\n", node->salary);
+  printf("Region code:          %d\n", node->region.code_region);
+  printf("Rate:                 %d\n", node->region.taux);
 }

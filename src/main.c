@@ -45,7 +45,7 @@ static inline void usage(void);
 extern char *optarg;
 extern int optind, opterr, optopt;
 
-int vflag, qflag, cflag, sflag;
+int vflag, qflag, cflag, sflag, lflag;
 
 int main(int argc, char *argv[]) {
 
@@ -53,8 +53,10 @@ int main(int argc, char *argv[]) {
   vflag = 0, qflag = 0; /* default off => a quieter program    */
   cflag = 0;            /* default off => there will be colors */
   sflag = 1;            /* default on => sync state with disk  */
+  lflag = 0;            /* default off => no redirect of stderr */
 
   path_to_disk_state = (char *)malloc(sizeof(char) * PATH_MAX);
+  char *path_to_log_file = (char *)malloc(sizeof(char) * PATH_MAX);
 
   // env vars parsing
   char *no_color = getenv("NO_COLOR");
@@ -67,7 +69,7 @@ int main(int argc, char *argv[]) {
 // fallback to short args parsing when getopt_long is not available
 #if !defined(__GNUC__)
   int opt;
-  while ((opt = getopt(argc, argv, "hcqsvp:")) != -1) {
+  while ((opt = getopt(argc, argv, "hcqsvl:p:")) != -1) {
     switch (opt) {
     case 'c':
       color = true;
@@ -86,6 +88,8 @@ int main(int argc, char *argv[]) {
     case 's':
       sflag = 0;
       break;
+    case 'l':
+      path_to_log_file = optarg;
     case 'h':
       usage();
       exit(EXIT_SUCCESS);
@@ -100,15 +104,16 @@ int main(int argc, char *argv[]) {
     static struct option long_options[] = {
         {"quiet", no_argument, &qflag, 'q'},
         {"help", no_argument, 0, 'h'},
-        {"no-color", no_argument, 0, 'c'},
+        {"no-color", no_argument, &cflag, 'c'},
         {"path", required_argument, 0, 'p'},
         {"stateless", no_argument, 0, 's'},
+        {"log-file", required_argument, &lflag, 'l'},
         {"verbose", no_argument, &vflag, 'v'},
         {0, 0, 0, 0},
     };
 
     int option_index = 0;
-    opt = getopt_long(argc, argv, "chqvp:", long_options, &option_index);
+    opt = getopt_long(argc, argv, "chqsvl:p:", long_options, &option_index);
     if (opt == -1)
       break;
 
@@ -140,6 +145,11 @@ int main(int argc, char *argv[]) {
       sflag = 0;
       break;
 
+    case 'l':
+      lflag = 1;
+      path_to_log_file = optarg;
+      break;
+
     case 'h':
       usage();
       exit(EXIT_SUCCESS);
@@ -159,31 +169,41 @@ int main(int argc, char *argv[]) {
   }
 #endif
 
-  // defaults to "state/record.txt"
+  // default state file to "state/record.txt"
   if (path_to_disk_state[0] == '\0')
     path_to_disk_state = "state/record.txt";
 
-  vflag &= !qflag;
-  cflag |= color;
-
-  // general loging
-  if (vflag) {
-    fprintf(stderr, "Info: verbose mode is on\n");
-    if (cflag)
-      fprintf(stderr, "Info: color mode is on");
-    if (!sflag)
-      fprintf(stderr, "Info: state file at '%s'", path_to_disk_state);
-    else
-      fprintf(stderr, "Info: saving state to disk is disabled");
+  // redirect stderr to supplied path
+  if (lflag) {
+    FILE *Fp = freopen(path_to_log_file, "a+", stderr);
+    if (Fp == NULL) {
+      panic("Fatal: failed redirection of stderr");
+    }
   }
 
   // warn on extraneous args
   if (optind < argc) {
     fprintf(stderr, "Warn: extra unused argv elements\n");
     while (optind < argc)
-      printf("%s ", argv[optind++]);
-    putchar('\n');
+      fprintf(stderr, "%s ", argv[optind++]);
+    fprintf(stderr, "\n");
   }
+
+  vflag &= !qflag;
+  cflag |= color;
+
+  // general loging
+  if (vflag) {
+    // TODO: add miscellaneous info here
+    fprintf(stderr, "Info: verbose mode is on\n");
+    if (cflag)
+      fprintf(stderr, "Info: color mode is on\n");
+    if (!sflag)
+      fprintf(stderr, "Info: state file at '%s'\n", path_to_disk_state);
+    else
+      fprintf(stderr, "Info: saving state to disk is disabled\n");
+  }
+
   //------------------------------------------------------------------//
   //               Initializing curses && EMPLOYEE list               //
   //------------------------------------------------------------------//
@@ -213,20 +233,25 @@ int main(int argc, char *argv[]) {
   // disables echoing by getch
   noecho();
 
-  // TODO: use the window's size in all further calculation of positions
-  int row, col;
-  getmaxyx(stdscr, row, col);
+  //------------------------------------------------------------------//
+  //                            home menu                             //
+  //------------------------------------------------------------------//
+
+  // TODO: use the window's size in all calculation of positions
+  term = (term_state *)malloc(sizeof(term_state));
+  getmaxyx(stdscr, term->row, term->col);
   char mesg[] = "Welcome";
-  mvprintw(row / 2, (col - (int)strlen(mesg)) / 2, "%s", mesg);
+  mvprintw((int)term->row / 2, (term->col - (int)strlen(mesg)) / 2, "%s", mesg);
   if (vflag == 1)
-    mvprintw(row - 2, 0, "This screen has %d rows and %d columns\n", row, col);
+    mvprintw(term->row - 2, 0, "This screen has %d rows and %d columns\n",
+             term->row, term->col);
 
   //------------------------------------------------------------------//
   //                         main menu logic                          //
   //------------------------------------------------------------------//
 
   // TODO: add main menu
-  char *choices_main[5] = {
+  const char *choices_main[5] = {
       "1 - Adding employee record",
       "2 - Delete employee record",
       "3 - Modify employee field ",
@@ -262,7 +287,7 @@ int main(int argc, char *argv[]) {
   set_menu_mark(main_menu, " * ");
 
   box(main_menu_win, 0, 0);
-  print_in_middle(main_menu_win, 1, 0, 40, "Main Menu", COLOR_PAIR(1));
+  print_in_middle(main_menu_win, "Main Menu", COLOR_PAIR(1));
   mvwaddch(main_menu_win, 2, 0, ACS_LTEE);
   mvwhline(main_menu_win, 2, 1, ACS_HLINE, 38);
   mvwaddch(main_menu_win, 2, 39, ACS_RTEE);
@@ -281,21 +306,41 @@ int main(int argc, char *argv[]) {
     case KEY_UP:
       menu_driver(main_menu, REQ_UP_ITEM);
       break;
+    case 'Q':
+      goto UNCURSE;
+      break;
     }
     wrefresh(main_menu_win);
   }
+
   //------------------------------------------------------------------//
-  //                        search menu logic                         //
+  //                         operations menu                          //
   //------------------------------------------------------------------//
 
   // TODO: add search menu
-  char *choices_search[3] = {
+  const char *choices_search[3] = {
       "1 - By Identifier",
       "2 - By Name",
       "3 - Go back to main menu",
   };
 
+  //------------------------------------------------------------------//
+  //                           fuzzy search                           //
+  //------------------------------------------------------------------//
+
+  // TODO: add fuzzy search
+
+  //------------------------------------------------------------------//
+  //                         resource cleanup                         //
+  //------------------------------------------------------------------//
+
+  // NOTE: more cleanup can be done
+
 UNCURSE:
+
+  free(term);
+  free(path_to_disk_state);
+  free(path_to_log_file);
 
   unpost_menu(main_menu);
   free_menu(main_menu);

@@ -49,15 +49,13 @@ char *intprtkey(int ch) {
 
     /*  If a printable character  */
 
-    keych[0] = ch;
+    keych[0] = (char)ch;
     return keych;
 
   } else {
 
     /*  Non-printable, so loop through our array of structs  */
-
     int n = 0;
-
     do {
       if (keys[n].code == ch)
         return keys[n].name;
@@ -68,26 +66,16 @@ char *intprtkey(int ch) {
   }
 }
 
+/// context dependent print function, takes a string and desired color and
+/// ensures printing in the middle of the most deeplest view
 void print_in_middle(WINDOW *win, char *string, chtype color) {
-  
-}
-
-void win_show(WINDOW *win, char *label, int label_color) {
-  int startx, starty, height, width;
-
-  getbegyx(win, starty, startx);
-  getmaxyx(win, height, width);
-
-  box(win, 0, 0);
-  mvwaddch(win, 2, 0, ACS_LTEE);
-  mvwhline(win, 2, 1, ACS_HLINE, width - 2);
-  mvwaddch(win, 2, width - 1, ACS_RTEE);
-
-  print_in_middle(win, 1, 0, width, label, COLOR_PAIR(label_color));
+  panic("TODO: add print_in_middle");
+  return;
 }
 
 char *intprtkey(int ch);
 
+/// handles key clicks at runtime
 void handlekeys(WINDOW *main_menu_win, MENU *main_menu) {
   int c;
   while ((c = wgetch(main_menu_win)) != KEY_F(1)) {

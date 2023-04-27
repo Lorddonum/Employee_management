@@ -12,6 +12,8 @@
 #include "all.h"
 
 /// check the success of allocation with exit on failure
+/// NOTE: it should be run right after the coressponding malloc to have a relevant
+/// error number displayed
 void check_alloc(void *ptr) {
   if (ptr == NULL) {
     fprintf(stderr, "Error value: %d\n", errno);
@@ -27,4 +29,10 @@ int check_string(char *buffer) {
       return true;
   }
   return false;
+}
+
+/// abort with an error message
+void panic(const char *msg) {
+  fputs(msg, stderr);
+  abort();
 }

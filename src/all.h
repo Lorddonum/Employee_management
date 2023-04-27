@@ -41,19 +41,23 @@ struct EMPLOYEE {
   EMPLOYEE *next;
 };
 
+// global view options
+typedef enum { welcome = 0, menu, search } view;
+
 /// global terminal size in a struct
 typedef struct {
-  size_t col;
-  size_t wid;
+  int col;
+  int row;
+  view state;
 } term_state;
 
 // NOTE: utility functions see "utils.c"
 void check_alloc(void *ptr);
 int check_string(char *buffer);
+void panic(const char *msg);
 
 // NOTE: graphical views / routines see "graphx.c"
-void print_in_middle(WINDOW *win, int starty, int startx, int width,
-                     char *string, chtype color);
+void print_in_middle(WINDOW *win, char *string, chtype color);
 char *intprtkey(int ch);
 
 // NOTE: employee base functions see "employee.c"
