@@ -54,7 +54,7 @@ int parse_file_to_list(FILE *state) {
     field_count++;
     cur->next = create_employee();
     sscanf(buffer, "%d, %s, %s, %d, %d, %d", &cur->mat, cur->namef, cur->namel,
-           &cur->region.code_region, &cur->region.taux, &cur->salary);
+           &cur->region.code, &cur->region.rate, &cur->salary);
     cur = cur->next;
   }
   if (vflag)
@@ -66,12 +66,10 @@ int parse_file_to_list(FILE *state) {
 
 /// initialize the EMPLOYEE linked list at global head
 void initlist(const char *path_to_disk_state) {
-
   if (head != NULL) {
     fprintf(stderr, "Error: trying to initialize a non-empty list\n");
     exit(EXIT_FAILURE);
   }
-
   if (sflag) {
     if (path_to_disk_state == NULL) {
       fputs("Error: no file specificed for long term storage\n", stderr);
@@ -81,10 +79,12 @@ void initlist(const char *path_to_disk_state) {
     parse_file_to_list(cache);
     return;
   }
-
   head = create_employee();
   if (vflag)
     fprintf(stderr, "Info: initialized empty head");
+}
 
-  return;
+/// TODO: dumps linked list to state file
+void pastelist(const char *path_to_disk_state) {
+  panic("TODO: implement pastelist");
 }

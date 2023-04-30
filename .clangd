@@ -1,3 +1,3 @@
 CompileFlags:
-  Add: [-xc, -std=c11, -Wall, -Wextra, -pedantic, -g, -Wconversion, -lncurses, -lmenu, -lform] 
+  Add: [-xc, -std=c11, -Wall, -Wextra, -pedantic, -g, -Wconversion, -I/usr/include/SDL2, -I/usr/include/directfb, -D_REENTRANT, -I3p/ ] 
   # Compiler: x86_64-w64-mingw32-gcc  # Change argv[0] of compile flags to `mingw`

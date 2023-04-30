@@ -14,15 +14,12 @@
 #else
 #include <sys/syslimits.h>
 #endif
-#define CTRL_U 21
-#define CTRL_D 4
+
+// constants
+#define WINDOW_WIDTH 1200
+#define WINDOW_HEIGHT 800
 
 // macros
-
-// NOTE: only works on static arrays (no vla)
-#define ARRAY_SIZE(a) (sizeof a / sizeof a[0])
-// TODO: extract all the windows dimesniosn from ioctl's window size
-#define GLOBAL_CORDS(a)
 
 // type declarations
 
@@ -35,8 +32,8 @@ struct EMPLOYEE {
   char *namef;
   char *namel;
   struct {
-    int code_region;
-    int taux;
+    int code;
+    int rate;
   } region;
   EMPLOYEE *next;
 };
@@ -66,6 +63,6 @@ void destruct_employee(EMPLOYEE *poor_soul);
 void show_employee(EMPLOYEE *node);
 
 // NOTE: disk <=> memory interchange see "disk.c"
-void initlist(const char* path_to_disk_state);
+void initlist(const char *path_to_disk_state);
 
 // vim: ft=c
