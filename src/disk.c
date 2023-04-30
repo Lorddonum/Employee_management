@@ -7,6 +7,8 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#include <sqlite3.h>
+
 #include <err.h>
 #include <errno.h>
 

@@ -1,4 +1,3 @@
-#include <curses.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -54,8 +53,6 @@ int check_string(char *buffer);
 void panic(const char *msg);
 
 // NOTE: graphical views / routines see "graphx.c"
-void print_in_middle(WINDOW *win, char *string, chtype color);
-char *intprtkey(int ch);
 
 // NOTE: employee base functions see "employee.c"
 EMPLOYEE *create_employee(void);

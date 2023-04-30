@@ -24,8 +24,6 @@
 #include <locale.h>
 #include <unistd.h>
 
-#include <sqlite3.h>
-
 #include <SDL2/SDL.h>
 
 #define NK_INCLUDE_FIXED_TYPES
@@ -42,7 +40,9 @@
 
 #include "all.h"
 
-#include "graphx.c"
+//------------------------------------------------------------------//
+//                        Base UI primitives                        //
+//------------------------------------------------------------------//
 
 extern int errno;
 
@@ -287,10 +287,6 @@ int main(int argc, char *argv[]) {
     nk_style_set_font(ctx, &font->handle);
   }
 
-  //------------------------------------------------------------------//
-  //                            home menu                             //
-  //------------------------------------------------------------------//
-
   bg.r = 0.10f, bg.g = 0.18f, bg.b = 0.24f, bg.a = 1.0f;
   while (running) {
     /* Input */
@@ -302,6 +298,10 @@ int main(int argc, char *argv[]) {
       nk_sdl_handle_event(&evt);
     }
     nk_input_end(ctx);
+
+    //------------------------------------------------------------------//
+    //                            home menu                             //
+    //------------------------------------------------------------------//
 
     /* GUI */
     if (nk_begin(ctx, "Employee Management", nk_rect(50, 50, 230, 250),
@@ -339,7 +339,39 @@ int main(int argc, char *argv[]) {
     }
     nk_end(ctx);
 
-    canvas(ctx);
+    //------------------------------------------------------------------//
+    //                         main menu logic                          //
+    //------------------------------------------------------------------//
+
+    // TODO: add main menu
+    const char *choices_main[5] = {
+        "Adding employee record",
+        "Delete employee record",
+        "Modify employee field ",
+        "Search for employee by field",
+        "Quit",
+    };
+
+    //------------------------------------------------------------------//
+    //                         operations menu                          //
+    //------------------------------------------------------------------//
+
+    // TODO: add search menu
+    const char *choices_search[3] = {
+        "By Identifier",
+        "By Name",
+        "Go back to main menu",
+    };
+
+    //------------------------------------------------------------------//
+    //                           fuzzy search                           //
+    //------------------------------------------------------------------//
+
+    // TODO: add fuzzy search
+
+    //------------------------------------------------------------------//
+    //                         resource cleanup                         //
+    //------------------------------------------------------------------//
 
     SDL_SetRenderDrawColor(renderer, (Uint8)(bg.r * 255), (Uint8)(bg.g * 255),
                            (Uint8)(bg.b * 255), (Uint8)(bg.a * 255));
@@ -349,40 +381,6 @@ int main(int argc, char *argv[]) {
 
     SDL_RenderPresent(renderer);
   }
-  //------------------------------------------------------------------//
-  //                         main menu logic                          //
-  //------------------------------------------------------------------//
-
-  // TODO: add main menu
-  const char *choices_main[5] = {
-      "Adding employee record",
-      "Delete employee record",
-      "Modify employee field ",
-      "Search for employee by field",
-      "Quit",
-  };
-
-  //------------------------------------------------------------------//
-  //                         operations menu                          //
-  //------------------------------------------------------------------//
-
-  // TODO: add search menu
-  const char *choices_search[3] = {
-      "By Identifier",
-      "By Name",
-      "Go back to main menu",
-  };
-
-  //------------------------------------------------------------------//
-  //                           fuzzy search                           //
-  //------------------------------------------------------------------//
-
-  // TODO: add fuzzy search
-
-  //------------------------------------------------------------------//
-  //                         resource cleanup                         //
-  //------------------------------------------------------------------//
-
   // NOTE: more cleanup can be done
 
 cleanup:
