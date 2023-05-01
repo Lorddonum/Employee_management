@@ -304,7 +304,7 @@ int main(int argc, char *argv[]) {
     //------------------------------------------------------------------//
 
     /* GUI */
-    if (nk_begin(ctx, "Employee Management", nk_rect(50, 50, 230, 250),
+    if (nk_begin(ctx, "Settings", nk_rect(50, 50, 230, 250),
                  NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_SCALABLE |
                      NK_WINDOW_MINIMIZABLE | NK_WINDOW_TITLE)) {
       enum { EASY, HARD };
@@ -342,6 +342,12 @@ int main(int argc, char *argv[]) {
     //------------------------------------------------------------------//
     //                         main menu logic                          //
     //------------------------------------------------------------------//
+
+    if (nk_begin(ctx, "main menu", nk_rect(50, 50, 230, 250),
+                 NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_SCALABLE |
+                     NK_WINDOW_MINIMIZABLE | NK_WINDOW_TITLE)) {
+    }
+    nk_end(ctx);
 
     // TODO: add main menu
     const char *choices_main[5] = {

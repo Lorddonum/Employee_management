@@ -7,10 +7,8 @@ EMPLOYEE *create_employee(void) {
   EMPLOYEE *local = NULL;
   local = (EMPLOYEE *)malloc(sizeof(EMPLOYEE));
   check_alloc(local);
-  local->namef = (char *)malloc(sizeof(char) * 25);
-  check_alloc(local->namef);
-  local->namel = (char *)malloc(sizeof(char) * 50);
-  check_alloc(local->namel);
+  local->namef = allocate_string(FIRST_NAME_LIM);
+  local->namel = allocate_string(LAST_NAME_LIM);
   local->next = NULL;
   return local;
 }
@@ -24,8 +22,8 @@ void destruct_employee(EMPLOYEE *deleted) {
 
 /// prints all employee fields
 void show_employee(EMPLOYEE *node) {
-  printf("First Name:           %s\n", node->namef);
-  printf("Last Name:            %s\n", node->namel);
+  printf("First Name:           %s\n", node->namef->ptr);
+  printf("Last Name:            %s\n", node->namel->ptr);
   printf("Identifier:           %d\n", node->mat);
   printf("Salary:               %d\n", node->salary);
   printf("Region code:          %d\n", node->region.code);
