@@ -8,3 +8,6 @@ Goals:
 * friendly and blazingly fast interactions
 * flawless memory management
 * world domination
+
+Resources:
+- [A Guided Tour to Approximate String Matching](http://repositorio.uchile.cl/bitstream/handle/2250/126168/Navarro_Gonzalo_Guided_tour.pdf)

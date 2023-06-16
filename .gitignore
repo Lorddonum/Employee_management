@@ -54,5 +54,9 @@ dkms.conf
 # CMake output
 build/*
 
+# Zig
+zig-cache/
+zig-out/
+
 # artifacts
 src/state

@@ -1,15 +1,22 @@
-OBJECTS 	= src/main.o src/utils.o src/employee.o src/disk.o
-CFLAGS 		= -std=c11 -Wall -Wextra -pedantic -Og
-CFLAGS 		+= $(shell pkg-config --cflags sdl2)
-LDFLAGS 	= $(shell pkg-config --libs sdl2)
+CC					?= zig cc
+SRC 				= src/disk.c src/employee.c src/main.c src/search.c src/sqlite.c src/table.c src/utils.c libs/sqlite/sqlite3.c
+OBJECTS 		= $(SRC:.c=.o) libs/raylib/zig-out/lib/libraylib.a
+CFLAGS 			+= -std=c2x -pedantic -Wall -Wextra -g3 -ggdb
 
-all: $(OBJECTS)
-	cc $(CFLAGS) -o emp.out $(OBJECTS) $(LDFLAGS)
+all: $(DEP) $(OBJECTS)
+	$(CC) $(CFLAGS) -o emp.out $(OBJECTS) $(LDFLAGS)
+
+DEP: raylib raygui
+
+raylib:
+	# TODO: add necessar setup steps for raylib
+	zig build ./libs/raylib
+
+raygui:
+	# TODO: add necessary setup steps for raygui
 
 .c.o:
-	cc $(CFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) -c -o $@ $<
 
-run: all
-	./emp.out
 clean:
 	rm -f $(OBJECTS) *.out *.plist */**.gch

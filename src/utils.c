@@ -1,4 +1,4 @@
-#include <stdbool.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -11,6 +11,7 @@
 
 #include "all.h"
 
+/// general purpose string type allocation
 string *allocate_string(size_t size) {
   string *allocated = NULL;
   allocated = (string *)malloc(sizeof(string));
@@ -22,6 +23,7 @@ string *allocate_string(size_t size) {
   return allocated;
 }
 
+/// general purpose string type destructor
 void destruct_string(string *str) {
   free(str->ptr);
   str->lim = 0;
@@ -52,4 +54,23 @@ int check_string(char *buffer) {
 void panic(const char *msg) {
   fputs(msg, stderr);
   abort();
+}
+
+/// general purpose comparison
+int cmp(int8_t a, int8_t b) {
+  if (a > b)
+    return 1;
+  if (a == b)
+    return 0;
+  if (a < b)
+    return -1;
+  unreachable();
+}
+
+// helper function for levenshtein
+// takes two numbers, returns the smaller one
+size_t min(size_t a, size_t b) {
+  if (a < b)
+    return a;
+  return b;
 }
