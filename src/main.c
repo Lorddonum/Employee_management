@@ -340,16 +340,16 @@ int main(int argc, char *argv[]) {
       GuiTextBox(inputBox, inputBuffer, sizeof(inputBuffer) - 1, true);
       EndDrawing();
     }
-
-    if (tflag)
-      shell_loop(path_to_disk_state, path_to_log_file);
-
-    // NOTE: more cleanup can always be done
-    free(path_to_disk_state);
-    free(path_to_log_file);
-
-    return EXIT_SUCCESS;
   }
+
+  if (tflag)
+    shell_loop(path_to_disk_state, path_to_log_file);
+
+  // NOTE: more cleanup can always be done
+  free(path_to_disk_state);
+  free(path_to_log_file);
+
+  return EXIT_SUCCESS;
 }
 
 static inline void usage(void) {
