@@ -1,7 +1,7 @@
-CC					?= zig cc
-SRC 				= src/employee.c src/main.c src/gui.c src/search.c src/sqlite.c src/table.c src/utils.c libs/sqlite/sqlite3.c
-OBJECTS 		= libs/raylib/zig-out/lib/libraylib.a
-ESSENTIAL 	= $(SRC:.c=.o) src/shell.o
+CC					= gcc
+SRC 				= src/employee.c src/shell.c src/main.c src/search.c src/sqlite.c src/table.c src/utils.c libs/sqlite/sqlite3.c
+OBJECTS 		= libs/static/libraylib.a
+ESSENTIAL 	= $(SRC:.c=.o)
 CFLAGS 			+= -std=c2x -pedantic -Wall -Wextra -g3 -ggdb
 LDFLAGS 		+= -leditline
 

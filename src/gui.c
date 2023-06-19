@@ -1,12 +1,6 @@
-#include "all.h"
-
-#include "../libs/raylib/zig-out/include/raylib.h"
-#define RAYGUI_IMPLEMENTATION
-#include "../libs/raygui/src/raygui.h"
-
 void DrawEmployeeData(EMPLOYEE *employees, int numEmployees, int startRow, int numRows) {
     int rowHeight = 20, y = 50, i;
-    Font customFont = LoadFontEx("Hack-Regular.ttf", 20, NULL, 0);
+    Font customFont = LoadFontEx("src/Hack-Regular.ttf", 20, NULL, 0);
     Vector2 textPosition = { 50, y };
     DrawTextEx(customFont, "Register", textPosition, 20, 2, BLACK);
     textPosition.x=150;

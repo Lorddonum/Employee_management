@@ -29,6 +29,8 @@
 #define RAYGUI_IMPLEMENTATION
 #include "../libs/raygui/src/raygui.h"
 
+#include "gui.c"
+
 extern int errno;
 
 extern char *__progname;
@@ -219,65 +221,13 @@ int main(int argc, char *argv[]) {
 
     SetTargetFPS(60);
 
-    // Example values
-
-    EMPLOYEE temp[4];
-
-    temp[0].mat = 123;
-    temp[0].salary = 20000;
-    temp[0].namef = (string *)malloc(sizeof(string));
-    temp[0].namel = (string *)malloc(sizeof(string));
-    temp[0].namef->ptr = (char *)malloc(50 * sizeof(char));
-    temp[0].namel->ptr = (char *)malloc(50 * sizeof(char));
-    strcpy(temp[0].namef->ptr, "Ali");
-    strcpy(temp[0].namel->ptr, "Bouqlwa");
-    temp[0].region.code = 103;
-    temp[0].region.rate = 13;
-
-    temp[1].mat = 122;
-    temp[1].salary = 20000;
-    temp[1].namef = (string *)malloc(sizeof(string));
-    temp[1].namel = (string *)malloc(sizeof(string));
-    temp[1].namef->ptr = (char *)malloc(50 * sizeof(char));
-    temp[1].namel->ptr = (char *)malloc(50 * sizeof(char));
-    strcpy(temp[1].namef->ptr, "Zakaria");
-    strcpy(temp[1].namel->ptr, "Bouqliwa");
-    temp[1].region.code = 102;
-    temp[1].region.rate = 12;
-
-    temp[2].mat = 121;
-    temp[2].salary = 20000;
-    temp[2].namef = (string *)malloc(sizeof(string));
-    temp[2].namel = (string *)malloc(sizeof(string));
-    temp[2].namef->ptr = (char *)malloc(50 * sizeof(char));
-    temp[2].namel->ptr = (char *)malloc(50 * sizeof(char));
-    strcpy(temp[2].namef->ptr, "Bouflouss");
-    strcpy(temp[2].namel->ptr, "YekhMennek");
-    temp[2].region.code = 101;
-    temp[2].region.rate = 11;
-
-    temp[3].mat = 120;
-    temp[3].salary = 20000;
-    temp[3].namef = (string *)malloc(sizeof(string));
-    temp[3].namel = (string *)malloc(sizeof(string));
-    temp[3].namef->ptr = (char *)malloc(50 * sizeof(char));
-    temp[3].namel->ptr = (char *)malloc(50 * sizeof(char));
-    strcpy(temp[3].namef->ptr, "Atae");
-    strcpy(temp[3].namel->ptr, "M9wda3lih");
-    temp[3].region.code = 100;
-    temp[3].region.rate = 10;
-
-    // End of example values
-
-    int numEmployees = sizeof(temp) / sizeof(temp[0]), numRows = 15,
-        startRow = 0;
+    size_t numEmployees = sizeof(temp) / sizeof(temp[0]);
+    size_t numRows = numEmployees;
+    size_t startRow = 0;
 
     Font defaultFont = GetFontDefault();
     defaultFont.baseSize = 20;
     GuiSetFont(defaultFont);
-
-    Font customFont = LoadFontEx("Hack-Regular.ttf", 40, NULL, 0);
-    GuiSetFont(customFont);
 
     // create a scrollbar
     Rectangle scrollbar = {900, 50, 20, numRows * 20};
@@ -340,6 +290,7 @@ int main(int argc, char *argv[]) {
       GuiTextBox(inputBox, inputBuffer, sizeof(inputBuffer) - 1, true);
       EndDrawing();
     }
+    UnloadFont(defaultFont);
   }
 
   if (tflag)

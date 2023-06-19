@@ -1,2 +1,2 @@
 CompileFlags:
-  Add: [-xc, -std=c2x, -Wall, -Wextra, -pedantic, -g, -Wconversion, -I3p/, -I libs/raygui/ ] 
+  Add: [-xc, -std=c2x, -Wall, -Wextra, -pedantic, -g, -lc, -Wconversion, -I libs/raygui/, -D_GNU_SOURCE ] 

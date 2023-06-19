@@ -22,7 +22,7 @@
  * into a hash table, based on Paul Hsieh's hash with minimal changes
  * http://burtleburtle.net/bob/hash/doobs.html
  */
-size_t hash(EMPLOYEE emp) {
+size_t get_hash(EMPLOYEE emp) {
   const char *data = strcat(emp.namef->ptr, emp.namel->ptr);
   size_t len = emp.namef->len + emp.namel->len;
 
