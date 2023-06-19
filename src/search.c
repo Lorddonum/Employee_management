@@ -41,7 +41,7 @@ size_t lev_dist(string *a, string *b) {
 // size_t dlwf_dist(string *a, string *b) {
 //   size_t diff = a->len - b->len;
 //   for (size_t i = 1 ; i < m ; ++i) {
-//   
+//
 //   }
 // }
 /// TODO: implementation of the Rabin fingerprint used later in Rabin-karp
@@ -49,7 +49,7 @@ size_t lev_dist(string *a, string *b) {
 
 /// TODO: implementation of the two-way algorithm
 /// https://en.wikipedia.org/wiki/Two-way_string-matching_algorithm
-size_t two_way(const char *needle, const char *haystack) {}
+// size_t two_way(const char *needle, const char *haystack) {}
 
 /// TODO: implementation of the knut-Morris-Pratt algorithm
 /// https://en.wikipedia.org/wiki/Knuth%E2%80%93Morris%E2%80%93Pratt_algorithm

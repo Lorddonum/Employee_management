@@ -1,3 +1,4 @@
+#include <signal.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,7 +14,7 @@
 
 /// general purpose string type allocation
 string *allocate_string(size_t size) {
-  string *allocated = NULL;
+  string *allocated = nullptr;
   allocated = (string *)malloc(sizeof(string));
   allocated->ptr = (char *)malloc(sizeof(char) * size);
   check_alloc(allocated->ptr);
@@ -34,7 +35,7 @@ void destruct_string(string *str) {
 /// NOTE: it should be run right after the coressponding malloc to have a
 /// relevant error number displayed
 void check_alloc(void *ptr) {
-  if (ptr == NULL) {
+  if (ptr == nullptr) {
     fprintf(stderr, "Error value: %d\n", errno);
     fprintf(stderr, "%s\n", strerror(errno));
     exit(2);
@@ -51,7 +52,7 @@ int check_string(char *buffer) {
 }
 
 /// abort with an error message
-void panic(const char *msg) {
+inline void panic(const char *msg) {
   fputs(msg, stderr);
   abort();
 }

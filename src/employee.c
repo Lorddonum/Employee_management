@@ -96,10 +96,16 @@ void destruct_employee(EMPLOYEE *deleted) {
 
 /// prints all employee fields
 void show_employee(EMPLOYEE *node) {
-  printf("First Name:           %s\n", node->namef->ptr);
-  printf("Last Name:            %s\n", node->namel->ptr);
-  printf("Identifier:           %d\n", node->mat);
-  printf("Salary:               %d\n", node->salary);
-  printf("Region code:          %d\n", node->region.code);
-  printf("Rate:                 %d\n", node->region.rate);
+  printf("First Name:  %s\n", node->namef->ptr);
+  printf("Last Name:   %s\n", node->namel->ptr);
+  printf("Identifier:  %d\n", node->mat);
+  printf("Salary:      %d\n", node->salary);
+  printf("Region code: %d\n", node->region.code);
+  printf("Rate:        %d\n", node->region.rate);
+}
+
+void list_employees(void) {
+  for (size_t i = 0; i < table_len; i++) {
+    show_employee(global_table[i].val);
+  }
 }

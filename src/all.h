@@ -50,7 +50,7 @@ typedef struct {
   size_t lim;
 } string;
 
-/// Employee linked list node type
+/// Employee node type
 struct EMPLOYEE {
   uint16_t mat;
   uint32_t salary;
@@ -70,6 +70,12 @@ typedef struct {
   EMPLOYEE *val;
 } hash_table;
 
+//---------
+// globals
+//---------
+extern hash_table *global_table;
+extern size_t table_len;
+
 /* NOTE: general plumbing functions see "utils.c" */
 void check_alloc(void *ptr);
 int check_string(char *buffer);
@@ -83,12 +89,17 @@ size_t min(size_t a, size_t b);
 EMPLOYEE *create_employee(void);
 void destruct_employee(EMPLOYEE *poor_soul);
 void show_employee(EMPLOYEE *node);
+void list_employees(void);
 
-/* NOTE: disk <=> memory interchange see "disk.c" */
-void initlist(const char *path_to_disk_state);
-void dumplist(const char *path_to_disk_state);
+/* NOTE: datastore memory intercom see "sqlite.c" */
+void force_init(char *path_to_disk_state);
+void load_all(char *path_to_disk_state);
+size_t get_count(char *path_to_disk_state);
 
 /* NOTE: search functions see "search.c" */
 size_t lev_dist(string *a, string *b);
+
+/* NOTE: shell functions see "shell.c" */
+int shell_loop(char *path_to_disk_state, char *path_to_log_file);
 
 // vim: ft=c
