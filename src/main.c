@@ -44,23 +44,37 @@ hash_table *global_table = nullptr;
 
 void DrawEmployeeData(EMPLOYEE *employees, int numEmployees, int startRow, int numRows) {
     int rowHeight = 20, y = 50, i;
-    DrawText("Register", 50, y, 20, BLACK);
-    DrawText("Salary", 150, y, 20, BLACK);
-    DrawText("FName", 300, y, 20, BLACK);
-    DrawText("LName", 500, y, 20, BLACK);
-    DrawText("Code", 650, y, 20, BLACK);
-    DrawText("Rate", 800, y, 20, BLACK);
+    Font customFont = LoadFontEx("Hack-Regular.ttf", 20, NULL, 0);
+    Vector2 textPosition = { 50, y };
+    DrawTextEx(customFont, "Register", textPosition, 20, 2, BLACK);
+    textPosition.x=150;
+    DrawTextEx(customFont, "Salary", textPosition, 20, 2, BLACK);
+    textPosition.x=300;
+    DrawTextEx(customFont, "FName", textPosition, 20, 2, BLACK);
+    textPosition.x=500;
+    DrawTextEx(customFont, "LName", textPosition, 20, 2, BLACK);
+    textPosition.x=650;
+    DrawTextEx(customFont, "Code", textPosition, 20, 2, BLACK);
+    textPosition.x=800;
+    DrawTextEx(customFont, "Rate", textPosition, 20, 2, BLACK);
     DrawLine(48, y + 1.5*rowHeight, 850, y + 1.5*rowHeight, BLACK);
-    y+=2*rowHeight;
+    textPosition.y+=2*rowHeight;
     for (i = startRow; i < startRow + numRows && i < numEmployees; i++) {
-        DrawText(TextFormat("%d", employees[i].mat), 50, y, 20, BLACK);
-        DrawText(TextFormat("%d", employees[i].salary), 150, y, 20, BLACK);
-        DrawText(employees[i].namef, 300, y, 20, BLACK);
-        DrawText(employees[i].namel, 500, y, 20, BLACK);
-        DrawText(TextFormat("%d", employees[i].region.code), 650, y, 20, BLACK);
-        DrawText(TextFormat("%d", employees[i].region.rate), 800, y, 20, BLACK);
-        y += rowHeight;
+        textPosition.x=50;
+        DrawTextEx(customFont, TextFormat("%hu", employees[i].mat), textPosition, 20, 2, BLACK);
+        textPosition.x=150;
+        DrawTextEx(customFont, TextFormat("%lu", employees[i].salary), textPosition, 20, 2, BLACK);
+        textPosition.x=300;
+        DrawTextEx(customFont, employees[i].namef->ptr, textPosition, 20, 2, BLACK);
+        textPosition.x=500;
+        DrawTextEx(customFont, employees[i].namel->ptr, textPosition, 20, 2, BLACK);
+        textPosition.x=650;
+        DrawTextEx(customFont, TextFormat("%hhu", employees[i].region.code), textPosition, 20, 2, BLACK);
+        textPosition.x=800;
+        DrawTextEx(customFont, TextFormat("%hhu", employees[i].region.rate), textPosition, 20, 2, BLACK);
+        textPosition.y += rowHeight;
     }
+    UnloadFont(customFont);
 }
 
 int main(int argc, char *argv[]) {
@@ -214,7 +228,6 @@ int main(int argc, char *argv[]) {
 
   const int screenWidth = 1024;
   const int screenHeight = 650;
-  int numEmployees = sizeof(temp) / sizeof(temp[0]),  numRows = 15, startRow = 0;
 
   SetConfigFlags(FLAG_WINDOW_UNDECORATED);
   InitWindow(screenWidth, screenHeight, "Employee Manager");
@@ -232,33 +245,59 @@ int main(int argc, char *argv[]) {
 
   EMPLOYEE temp[4];
   
-  temp[0].mat=123;
-  temp[0].salary=20000;
-  strcpy(temp[0].namef,"Ali");
-  strcpy(temp[0].namel, "Bouqlwa");
-  temp[0].region.code=103;
-  temp[0].region.rate=12;
+    temp[0].mat=123;
+    temp[0].salary=20000;
+    temp[0].namef=(string*)malloc(sizeof(string));
+    temp[0].namel=(string*)malloc(sizeof(string));
+    temp[0].namef->ptr=(char*)malloc(50*sizeof(char));
+    temp[0].namel->ptr=(char*)malloc(50*sizeof(char));
+    strcpy(temp[0].namef->ptr,"Ali");
+    strcpy(temp[0].namel->ptr, "Bouqlwa");
+    temp[0].region.code=103;
+    temp[0].region.rate=13;
 
-  temp[1].mat=123;
-  temp[1].salary=20000;
-  strcpy(temp[1].namef,"Zakaria");
-  strcpy(temp[1].namel, "Bouqliwa");
-  temp[1].region.code=103;
-  temp[1].region.rate=12;
+    temp[1].mat=122;
+    temp[1].salary=20000;
+    temp[1].namef=(string*)malloc(sizeof(string));
+    temp[1].namel=(string*)malloc(sizeof(string));
+    temp[1].namef->ptr=(char*)malloc(50*sizeof(char));
+    temp[1].namel->ptr=(char*)malloc(50*sizeof(char));
+    strcpy(temp[1].namef->ptr,"Zakaria");
+    strcpy(temp[1].namel->ptr, "Bouqliwa");
+    temp[1].region.code=102;
+    temp[1].region.rate=12;
 
-  temp[2].mat=123;
-  temp[2].salary=20000;
-  strcpy(temp[2].namef,"Bouflouss");
-  strcpy(temp[2].namel, "YekhMennek");
-  temp[2].region.code=103;
-  temp[2].region.rate=12;
+    temp[2].mat=121;
+    temp[2].salary=20000;
+    temp[2].namef=(string*)malloc(sizeof(string));
+    temp[2].namel=(string*)malloc(sizeof(string));
+    temp[2].namef->ptr=(char*)malloc(50*sizeof(char));
+    temp[2].namel->ptr=(char*)malloc(50*sizeof(char));
+    strcpy(temp[2].namef->ptr,"Bouflouss");
+    strcpy(temp[2].namel->ptr, "YekhMennek");
+    temp[2].region.code=101;
+    temp[2].region.rate=11;
 
-  temp[3].mat=123;
-  temp[3].salary=20000;
-  strcpy(temp[3].namef,"Atae");
-  strcpy(temp[3].namel, "M9wda3lih");
-  temp[3].region.code=103;
-  temp[3].region.rate=12;
+    temp[3].mat=120;
+    temp[3].salary=20000;
+    temp[3].namef=(string*)malloc(sizeof(string));
+    temp[3].namel=(string*)malloc(sizeof(string));
+    temp[3].namef->ptr=(char*)malloc(50*sizeof(char));
+    temp[3].namel->ptr=(char*)malloc(50*sizeof(char));
+    strcpy(temp[3].namef->ptr,"Atae");
+    strcpy(temp[3].namel->ptr, "M9wda3lih");
+    temp[3].region.code=100;
+    temp[3].region.rate=10;
+
+  int numEmployees = sizeof(temp) / sizeof(temp[0]),  numRows = 15, startRow = 0;
+
+
+  Font defaultFont = GetFontDefault();
+  defaultFont.baseSize = 20;
+  GuiSetFont(defaultFont);
+  
+  /*Font customFont = LoadFontEx("Hack-Regular.ttf", 40, NULL, 0);
+  GuiSetFont(customFont);*/
 
   // create a scrollbar
   Rectangle scrollbar = { 900, 50, 20, numRows * 20 };
@@ -311,13 +350,13 @@ int main(int argc, char *argv[]) {
 
     // display EMPLOYEE data
     DrawEmployeeData(temp, numEmployees, startRow, numRows);
-    GuiTextBox(inputBox, inputBuffer, sizeof(inputBuffer) - 1, true);
-    
+    // display text input box
+    GuiTextBox(inputBox, inputBuffer, sizeof(inputBuffer) - 1, true);    
     EndDrawing();
   }
   CloseWindow(); // Close window and OpenGL context
 
-  // NOTE: more cleanup can always be be done
+  // NOTE: more cleanup can always be done
   free(path_to_disk_state);
   free(path_to_log_file);
 
