@@ -1,10 +1,12 @@
 CC					?= zig cc
-SRC 				= src/disk.c src/employee.c src/main.c src/search.c src/sqlite.c src/table.c src/utils.c libs/sqlite/sqlite3.c
-OBJECTS 		= $(SRC:.c=.o) libs/raylib/zig-out/lib/libraylib.a
+SRC 				= src/employee.c src/main.c src/search.c src/sqlite.c src/table.c src/utils.c libs/sqlite/sqlite3.c
+OBJECTS 		= libs/raylib/zig-out/lib/libraylib.a
+ESSENTIAL 	= $(SRC:.c=.o) src/shell.o
 CFLAGS 			+= -std=c2x -pedantic -Wall -Wextra -g3 -ggdb
+LDFLAGS 		+= -leditline
 
-all: $(OBJECTS)
-	$(CC) $(CFLAGS) -o emp.out $(OBJECTS) $(LDFLAGS)
+all: $(DEP) $(ESSENTIAL)
+	$(CC) $(CFLAGS) -o emp.out $(ESSENTIAL) $(OBJECTS) $(LDFLAGS)
 
 DEP: raylib raygui
 
@@ -19,4 +21,4 @@ raygui:
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 clean:
-	rm -f $(OBJECTS) *.out *.plist */**.gch
+	rm -f $(ESSENTIAL) *.out *.plist */**.gch
