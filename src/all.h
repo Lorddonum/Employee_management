@@ -91,4 +91,7 @@ void dumplist(const char *path_to_disk_state);
 /* NOTE: search functions see "search.c" */
 size_t lev_dist(string *a, string *b);
 
+/* NOTE: gui functions see "gui.c" */
+void DrawEmployeeData(EMPLOYEE *employees, int numEmployees, int startRow, int numRows);
+
 // vim: ft=c
