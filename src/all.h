@@ -102,4 +102,7 @@ size_t lev_dist(string *a, string *b);
 /* NOTE: shell functions see "shell.c" */
 int shell_loop(char *path_to_disk_state, char *path_to_log_file);
 
+/* NOTE: gui functions see "gui.c" */
+void DrawEmployeeData(EMPLOYEE *employees, int numEmployees, int startRow, int numRows);
+
 // vim: ft=c
