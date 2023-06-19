@@ -14,6 +14,7 @@
 #include <stddef.h>
 
 #ifdef __GNUC__
+#define _GNU_SOURCE
 #include <getopt.h>
 #endif
 #if defined(_WIN32) || defined(WIN32)
@@ -37,16 +38,18 @@ static inline void usage(void);
 extern char *optarg;
 extern int optind, opterr, optopt;
 
-bool aflag, vflag, qflag, cflag, sflag, lflag;
+bool aflag, vflag, qflag, cflag, sflag, tflag, lflag;
 
 hash_table *global_table = nullptr;
+size_t table_len = 0;
 
 int main(int argc, char *argv[]) {
   /* cli */
-  vflag = 0, qflag = 0; /* default off => a quieter program    */
-  sflag = 1;            /* default on => sync state with disk  */
-  lflag = 0;            /* default off => no redirect of stderr */
-  aflag = 0;            /* default off => won't use sqlite */
+  vflag = false, qflag = false; /* default off => a quieter program    */
+  sflag = true;                 /* default on => sync state with disk  */
+  lflag = false;                /* default off => no redirect of stderr */
+  aflag = false;                /* default off => won't use sqlite */
+  tflag = false;                /* default off => gui on */
 
   char *path_to_disk_state = (char *)malloc(sizeof(char) * PATH_MAX);
   check_alloc(path_to_disk_state);
@@ -55,7 +58,7 @@ int main(int argc, char *argv[]) {
 
 #if !defined(__GNUC__)
   int opt;
-  while ((opt = getopt(argc, argv, "hcqsvl:p:")) != -1) {
+  while ((opt = getopt(argc, argv, "hcqstvl:p:")) != -1) {
     switch (opt) {
     case 'a':
       aflag = true;
@@ -69,6 +72,9 @@ int main(int argc, char *argv[]) {
       break;
     case 'v':
       vflag = true;
+      break;
+    case 't':
+      tflag = true;
       break;
     case 's':
       sflag = false;
@@ -94,12 +100,13 @@ int main(int argc, char *argv[]) {
         {"stateless", no_argument, 0, 's'},
         {"sqlite", no_argument, 0, 'a'},
         {"log-file", required_argument, 0, 'l'},
+        {"text-mode", no_argument, 0, 't'},
         {"verbose", no_argument, 0, 'v'},
         {0, 0, 0, 0},
     };
 
     int option_index = 0;
-    opt = getopt_long(argc, argv, "achqsvl:p:", long_options, &option_index);
+    opt = getopt_long(argc, argv, "achqsvtl:p:", long_options, &option_index);
     if (opt == -1)
       break;
 
@@ -128,6 +135,10 @@ int main(int argc, char *argv[]) {
 
     case 's':
       sflag = false;
+      break;
+
+    case 't':
+      tflag = true;
       break;
 
     case 'l':
@@ -186,74 +197,80 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  //----------------------------------------------------------------------------
-  // Gui main entry point
-  //----------------------------------------------------------------------------
+  if (!tflag) {
 
-  const int screenWidth = 800;
-  const int screenHeight = 600;
+    //----------------------------------------------------------------------------
+    // Gui main entry point
+    //----------------------------------------------------------------------------
 
-  SetConfigFlags(FLAG_WINDOW_UNDECORATED);
-  InitWindow(screenWidth, screenHeight, "raygui - portable window");
+    const int screenWidth = 1200;
+    const int screenHeight = 800;
 
-  // General variables
-  Vector2 mousePosition = {0};
-  Vector2 windowPosition = {500, 200};
-  Vector2 panOffset = mousePosition;
-  bool dragWindow = false;
+    SetConfigFlags(FLAG_WINDOW_UNDECORATED);
+    InitWindow(screenWidth, screenHeight, "raygui - portable window");
 
-  SetWindowPosition((int)windowPosition.x, (int)windowPosition.y);
+    // General variables
+    Vector2 mousePosition = {0};
+    Vector2 windowPosition = {500, 200};
+    Vector2 panOffset = mousePosition;
+    bool dragWindow = false;
 
-  bool exitWindow = false;
+    SetWindowPosition((int)windowPosition.x, (int)windowPosition.y);
 
-  SetTargetFPS(60);
+    bool exitWindow = false;
 
-  //----------------------------------------------------------------------------
-  // Main loop
-  //----------------------------------------------------------------------------
+    SetTargetFPS(60);
 
-  // Detect window close button or ESC key
-  while (!exitWindow && !WindowShouldClose()) {
-    // Update
-    //----------------------------------------------------------------------------------
-    mousePosition = GetMousePosition();
+    //----------------------------------------------------------------------------
+    // Main loop
+    //----------------------------------------------------------------------------
 
-    if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && !dragWindow) {
-      if (CheckCollisionPointRec(mousePosition,
-                                 (Rectangle){0, 0, screenWidth, 20})) {
-        dragWindow = true;
-        panOffset = mousePosition;
+    // Detect window close button or ESC key
+    while (!exitWindow && !WindowShouldClose()) {
+      // Update
+      //----------------------------------------------------------------------------------
+      mousePosition = GetMousePosition();
+
+      if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && !dragWindow) {
+        if (CheckCollisionPointRec(mousePosition,
+                                   (Rectangle){0, 0, screenWidth, 20})) {
+          dragWindow = true;
+          panOffset = mousePosition;
+        }
       }
+
+      if (dragWindow) {
+        windowPosition.x += (mousePosition.x - panOffset.x);
+        windowPosition.y += (mousePosition.y - panOffset.y);
+
+        SetWindowPosition((int)windowPosition.x, (int)windowPosition.y);
+
+        if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON))
+          dragWindow = false;
+      }
+      //----------------------------------------------------------------------------------
+
+      // Draw
+      //----------------------------------------------------------------------------------
+      BeginDrawing();
+
+      ClearBackground(RAYWHITE);
+
+      exitWindow = GuiWindowBox((Rectangle){0, 0, screenWidth, screenHeight},
+                                "#198# PORTABLE WINDOW");
+
+      DrawText(TextFormat("Mouse Position: [ %.0f, %.0f ]", mousePosition.x,
+                          mousePosition.y),
+               10, 40, 10, DARKGRAY);
+
+      EndDrawing();
+      //----------------------------------------------------------------------------------
     }
-
-    if (dragWindow) {
-      windowPosition.x += (mousePosition.x - panOffset.x);
-      windowPosition.y += (mousePosition.y - panOffset.y);
-
-      SetWindowPosition((int)windowPosition.x, (int)windowPosition.y);
-
-      if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON))
-        dragWindow = false;
-    }
-    //----------------------------------------------------------------------------------
-
-    // Draw
-    //----------------------------------------------------------------------------------
-    BeginDrawing();
-
-    ClearBackground(RAYWHITE);
-
-    exitWindow = GuiWindowBox((Rectangle){0, 0, screenWidth, screenHeight},
-                              "#198# PORTABLE WINDOW");
-
-    DrawText(TextFormat("Mouse Position: [ %.0f, %.0f ]", mousePosition.x,
-                        mousePosition.y),
-             10, 40, 10, DARKGRAY);
-
-    EndDrawing();
-    //----------------------------------------------------------------------------------
+    CloseWindow(); // Close window and OpenGL context
   }
-  CloseWindow(); // Close window and OpenGL context
+
+  if (tflag)
+    shell_loop(path_to_disk_state, path_to_log_file);
 
   // NOTE: more cleanup can always be be done
   free(path_to_disk_state);
@@ -270,6 +287,8 @@ static inline void usage(void) {
           "\t-q, --quiet          disable verbose logging\n"
           "\t-p, --path PATH      specify path of the state db\n"
           "\t-l, --log-file PATH  specify path of the log file\n"
+          "\t-s, --stateless      disable the use of databases\n"
+          "\t-t, --text-mode      replace the gui with a repl\n"
           "\t-h, --help           prints out this help\n",
           __progname, __progname);
 }
