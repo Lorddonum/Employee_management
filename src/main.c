@@ -50,7 +50,6 @@ int main(int argc, char *argv[]) {
   vflag = false, qflag = false; /* default off => a quieter program    */
   sflag = true;                 /* default on => sync state with disk  */
   lflag = false;                /* default off => no redirect of stderr */
-  aflag = false;                /* default off => won't use sqlite */
   tflag = false;                /* default off => gui on */
 
   char *path_to_disk_state = (char *)malloc(sizeof(char) * PATH_MAX);
@@ -62,9 +61,6 @@ int main(int argc, char *argv[]) {
   int opt;
   while ((opt = getopt(argc, argv, "hcqstvl:p:")) != -1) {
     switch (opt) {
-    case 'a':
-      aflag = true;
-      break;
     case 'p':
       strcpy(path_to_disk_state, optarg);
       fprintf(stderr, "Info: given path is %s\n", optarg);
@@ -100,7 +96,6 @@ int main(int argc, char *argv[]) {
         {"no-color", no_argument, 0, 'c'},
         {"path", required_argument, 0, 'p'},
         {"stateless", no_argument, 0, 's'},
-        {"sqlite", no_argument, 0, 'a'},
         {"log-file", required_argument, 0, 'l'},
         {"text-mode", no_argument, 0, 't'},
         {"verbose", no_argument, 0, 'v'},
@@ -108,7 +103,7 @@ int main(int argc, char *argv[]) {
     };
 
     int option_index = 0;
-    opt = getopt_long(argc, argv, "achqsvtl:p:", long_options, &option_index);
+    opt = getopt_long(argc, argv, "chqsvtl:p:", long_options, &option_index);
     if (opt == -1)
       break;
 
@@ -121,10 +116,6 @@ int main(int argc, char *argv[]) {
       if (optarg)
         printf(" with arg %s", optarg);
       printf("\n");
-      break;
-
-    case 'a':
-      aflag = true;
       break;
 
     case 'q':
