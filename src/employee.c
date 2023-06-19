@@ -109,3 +109,7 @@ void list_employees(void) {
     show_employee(global_table[i].val);
   }
 }
+
+void add_employee(EMPLOYEE unit) {
+
+}

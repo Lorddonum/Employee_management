@@ -70,6 +70,13 @@ typedef struct {
   EMPLOYEE *val;
 } hash_table;
 
+/// search mode
+typedef enum {
+  exact,
+  lev,
+  fuzz,
+} search_mode;
+
 //---------
 // globals
 //---------
@@ -86,13 +93,16 @@ int cmp(int8_t a, int8_t b);
 size_t min(size_t a, size_t b);
 void stringcpy(string *dest, const unsigned char *src);
 
-/* NOTE: employee base functions see "employee.c" */
+/* NOTE: employee && hash table functions see "employee.c" and "table.c" */
 EMPLOYEE *create_employee(void);
 void destruct_employee(EMPLOYEE *poor_soul);
 void show_employee(EMPLOYEE *node);
 void list_employees(void);
 size_t get_hash(EMPLOYEE emp);
 hash_table *allocate_hashtable(size_t n_elem);
+
+EMPLOYEE *search_by_id(uint16_t key);
+void search_wrapper(search_mode set);
 
 /* NOTE: datastore memory intercom see "sqlite.c" */
 void force_init(char *path_to_disk_state);
@@ -107,6 +117,7 @@ size_t lev_dist(string *a, string *b);
 int shell_loop(char *path_to_disk_state, char *path_to_log_file);
 
 /* NOTE: gui functions see "gui.c" */
-void DrawEmployeeData(EMPLOYEE *employees, int numEmployees, int startRow, int numRows);
+void DrawEmployeeData(EMPLOYEE *employees, int numEmployees, int startRow,
+                      int numRows);
 
 // vim: ft=c

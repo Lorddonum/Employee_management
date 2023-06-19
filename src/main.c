@@ -14,7 +14,9 @@
 #include <stddef.h>
 
 #ifdef __GNUC__
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif /* ifndef _GNU_SOURCE */
 #include <getopt.h>
 #endif
 #if defined(_WIN32) || defined(WIN32)
@@ -159,12 +161,12 @@ int main(int argc, char *argv[]) {
 
   // default state file to "state/record.txt"
   if (sflag && path_to_disk_state[0] == '\0')
-    strcpy(path_to_disk_state, "state/record.txt");
+    strcpy(path_to_disk_state, "state/record.db");
 
   // redirect stderr to supplied path
   if (lflag) {
-    FILE *Fp = freopen(path_to_log_file, "a+", stderr);
-    if (Fp == NULL) {
+    FILE *fp = freopen(path_to_log_file, "a+", stderr);
+    if (fp == NULL) {
       panic("Fatal: failed redirection of stderr");
     }
   }
@@ -190,10 +192,11 @@ int main(int argc, char *argv[]) {
     }
   }
 
-    //----------------------------------------------------------------------------
-    // Initilization
-    //----------------------------------------------------------------------------
+  //----------------------------------------------------------------------------
+  // Initilization
+  //----------------------------------------------------------------------------
 
+#if 0
   if (!tflag) {
     //----------------------------------------------------------------------------
     // Gui main entry point
@@ -288,6 +291,7 @@ int main(int argc, char *argv[]) {
     UnloadFont(defaultFont);
   }
 
+#endif
   if (tflag)
     shell_loop(path_to_disk_state, path_to_log_file);
 

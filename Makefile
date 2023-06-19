@@ -20,5 +20,8 @@ raygui:
 .c.o:
 	$(CC) $(CFLAGS) -c -o $@ $<
 
+docs:
+	doxygen src/
+
 clean:
 	rm -f $(ESSENTIAL) *.out *.plist */**.gch

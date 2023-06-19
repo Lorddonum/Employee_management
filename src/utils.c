@@ -34,11 +34,11 @@ void destruct_string(string *str) {
 /// check the success of allocation with exit on failure
 /// NOTE: it should be run right after the coressponding malloc to have a
 /// relevant error number displayed
-void check_alloc(void *ptr) {
+inline void check_alloc(void *ptr) {
   if (ptr == nullptr) {
     fprintf(stderr, "Error value: %d\n", errno);
     fprintf(stderr, "%s\n", strerror(errno));
-    exit(2);
+    abort();
   }
 }
 

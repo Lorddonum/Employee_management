@@ -61,3 +61,5 @@ zig-out/
 # artifacts
 src/state
 *history
+html/
+latex/

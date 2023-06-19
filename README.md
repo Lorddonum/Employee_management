@@ -10,9 +10,9 @@ Goals:
 * world domination
 
 Dependencies:
-* raylib
-* zig
-* editline
+* [raylib](https://github.com/raysan5/raylib/)
+* [zig](https://github.com/ziglang/zig)
+* [editline](https://github.com/troglobit/editline)
 
 Resources:
 - [A Guided Tour to Approximate String Matching](http://repositorio.uchile.cl/bitstream/handle/2250/126168/Navarro_Gonzalo_Guided_tour.pdf)

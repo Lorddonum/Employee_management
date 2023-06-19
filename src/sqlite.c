@@ -134,4 +134,30 @@ void dump_all(char *path_to_disk_state) {
   sqlite3_close(db);
 }
 
-void modify_entry(char *path_to_disk_state, EMPLOYEE entry) {}
+void add_entry(char *path_to_disk_state, EMPLOYEE *entry) {
+  sqlite3 *db;
+  char *stmt_txt = nullptr;
+  sqlite3_stmt *stmt;
+
+  asprintf(&stmt_txt,
+           "INSERT INTO EMPLOYEES (salary , first , last , code , rate ), "
+           "VALUES (%d, '%s', '%s', %d, %d)",
+           entry->salary, entry->namef->ptr, entry->namel->ptr,
+           entry->region.code, entry->region.rate);
+  int rc =
+      sqlite3_open_v2(path_to_disk_state, &db, SQLITE_OPEN_READWRITE, NULL);
+  if (rc != SQLITE_OK) {
+    fprintf(stderr, "cannot open database: %s\n", sqlite3_errmsg(db));
+    sqlite3_close(db);
+  }
+  char *err_msg = 0;
+  rc = sqlite3_exec(db, stmt, 0, 0, &err_msg);
+  if (rc != SQLITE_OK) {
+    fprintf(stderr, "SQL error: %s\n", err_msg);
+    sqlite3_free(err_msg);
+    sqlite3_close(db);
+    panic(nullptr);
+  }
+  sqlite3_close(db);
+}
+void modify_entry(char *path_to_disk_state, EMPLOYEE *entry) {}
