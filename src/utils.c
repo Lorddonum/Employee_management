@@ -51,6 +51,18 @@ int check_string(char *buffer) {
   return false;
 }
 
+/// copies a characters arrays into our custom string type
+void stringcpy(string *dest, const unsigned char *src) {
+  size_t len = 0;
+  if ((len = strlen(src)) > dest->lim) {
+    realloc(dest->ptr, sizeof(char) * (len));
+    check_alloc(dest->ptr);
+    dest->lim = len;
+  }
+  dest->len = len;
+  strcpy(dest->ptr, src);
+}
+
 /// abort with an error message
 inline void panic(const char *msg) {
   fputs(msg, stderr);
