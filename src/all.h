@@ -84,17 +84,20 @@ string *allocate_string(size_t size);
 void destruct_string(string *str);
 int cmp(int8_t a, int8_t b);
 size_t min(size_t a, size_t b);
+void stringcpy(string *dest, const unsigned char *src);
 
 /* NOTE: employee base functions see "employee.c" */
 EMPLOYEE *create_employee(void);
 void destruct_employee(EMPLOYEE *poor_soul);
 void show_employee(EMPLOYEE *node);
 void list_employees(void);
+size_t get_hash(EMPLOYEE emp);
 
 /* NOTE: datastore memory intercom see "sqlite.c" */
 void force_init(char *path_to_disk_state);
 void load_all(char *path_to_disk_state);
 size_t get_count(char *path_to_disk_state);
+void dump_all(char *path_to_disk_state);
 
 /* NOTE: search functions see "search.c" */
 size_t lev_dist(string *a, string *b);
