@@ -41,6 +41,28 @@ bool aflag, vflag, qflag, cflag, sflag, lflag;
 
 hash_table *global_table = nullptr;
 
+
+void DrawEmployeeData(EMPLOYEE *employees, int numEmployees, int startRow, int numRows) {
+    int rowHeight = 20, y = 50, i;
+    DrawText("Register", 50, y, 20, BLACK);
+    DrawText("Salary", 150, y, 20, BLACK);
+    DrawText("FName", 300, y, 20, BLACK);
+    DrawText("LName", 500, y, 20, BLACK);
+    DrawText("Code", 650, y, 20, BLACK);
+    DrawText("Rate", 800, y, 20, BLACK);
+    DrawLine(48, y + 1.5*rowHeight, 850, y + 1.5*rowHeight, BLACK);
+    y+=2*rowHeight;
+    for (i = startRow; i < startRow + numRows && i < numEmployees; i++) {
+        DrawText(TextFormat("%d", employees[i].mat), 50, y, 20, BLACK);
+        DrawText(TextFormat("%d", employees[i].salary), 150, y, 20, BLACK);
+        DrawText(employees[i].namef, 300, y, 20, BLACK);
+        DrawText(employees[i].namel, 500, y, 20, BLACK);
+        DrawText(TextFormat("%d", employees[i].region.code), 650, y, 20, BLACK);
+        DrawText(TextFormat("%d", employees[i].region.rate), 800, y, 20, BLACK);
+        y += rowHeight;
+    }
+}
+
 int main(int argc, char *argv[]) {
   /* cli */
   vflag = 0, qflag = 0; /* default off => a quieter program    */
@@ -190,13 +212,13 @@ int main(int argc, char *argv[]) {
   // Gui main entry point
   //----------------------------------------------------------------------------
 
-  const int screenWidth = 800;
-  const int screenHeight = 600;
+  const int screenWidth = 1024;
+  const int screenHeight = 650;
+  int numEmployees = sizeof(temp) / sizeof(temp[0]),  numRows = 15, startRow = 0;
 
   SetConfigFlags(FLAG_WINDOW_UNDECORATED);
-  InitWindow(screenWidth, screenHeight, "raygui - portable window");
+  InitWindow(screenWidth, screenHeight, "Employee Manager");
 
-  // General variables
   Vector2 mousePosition = {0};
   Vector2 windowPosition = {500, 200};
   Vector2 panOffset = mousePosition;
@@ -208,19 +230,49 @@ int main(int argc, char *argv[]) {
 
   SetTargetFPS(60);
 
-  //----------------------------------------------------------------------------
-  // Main loop
-  //----------------------------------------------------------------------------
+  EMPLOYEE temp[4];
+  
+  temp[0].mat=123;
+  temp[0].salary=20000;
+  strcpy(temp[0].namef,"Ali");
+  strcpy(temp[0].namel, "Bouqlwa");
+  temp[0].region.code=103;
+  temp[0].region.rate=12;
 
-  // Detect window close button or ESC key
+  temp[1].mat=123;
+  temp[1].salary=20000;
+  strcpy(temp[1].namef,"Zakaria");
+  strcpy(temp[1].namel, "Bouqliwa");
+  temp[1].region.code=103;
+  temp[1].region.rate=12;
+
+  temp[2].mat=123;
+  temp[2].salary=20000;
+  strcpy(temp[2].namef,"Bouflouss");
+  strcpy(temp[2].namel, "YekhMennek");
+  temp[2].region.code=103;
+  temp[2].region.rate=12;
+
+  temp[3].mat=123;
+  temp[3].salary=20000;
+  strcpy(temp[3].namef,"Atae");
+  strcpy(temp[3].namel, "M9wda3lih");
+  temp[3].region.code=103;
+  temp[3].region.rate=12;
+
+  // create a scrollbar
+  Rectangle scrollbar = { 900, 50, 20, numRows * 20 };
+  bool scrollbarClicked = false;
+
+  char inputBuffer[256] = { 0 };
+  Rectangle inputBox = { screenWidth / 2 - 200, screenHeight - 70, 400, 40 };
+
   while (!exitWindow && !WindowShouldClose()) {
-    // Update
-    //----------------------------------------------------------------------------------
+    
     mousePosition = GetMousePosition();
 
     if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && !dragWindow) {
-      if (CheckCollisionPointRec(mousePosition,
-                                 (Rectangle){0, 0, screenWidth, 20})) {
+      if (CheckCollisionPointRec(mousePosition, (Rectangle){0, 0, screenWidth, 20})) {
         dragWindow = true;
         panOffset = mousePosition;
       }
@@ -235,23 +287,33 @@ int main(int argc, char *argv[]) {
       if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON))
         dragWindow = false;
     }
-    //----------------------------------------------------------------------------------
 
-    // Draw
-    //----------------------------------------------------------------------------------
     BeginDrawing();
 
     ClearBackground(RAYWHITE);
 
-    exitWindow = GuiWindowBox((Rectangle){0, 0, screenWidth, screenHeight},
-                              "#198# PORTABLE WINDOW");
+    exitWindow = GuiWindowBox((Rectangle){0, 0, screenWidth, screenHeight}, "#198# PORTABLE WINDOW");
 
-    DrawText(TextFormat("Mouse Position: [ %.0f, %.0f ]", mousePosition.x,
-                        mousePosition.y),
-             10, 40, 10, DARKGRAY);
+    DrawText(TextFormat("Mouse Position: [ %.0f, %.0f ]", mousePosition.x, mousePosition.y), 10, 40, 10, DARKGRAY);
 
+    // draw scrollbar and handle input
+    if (CheckCollisionPointRec(GetMousePosition(), scrollbar) || scrollbarClicked) {
+        if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
+            scrollbarClicked = true;
+            startRow = (GetMouseY() - scrollbar.y) * numEmployees / (numRows * 20);
+        } else {
+            scrollbarClicked = false;
+        }
+        DrawRectangleRec(scrollbar, DARKGRAY);
+    } else {
+        DrawRectangleRec(scrollbar, LIGHTGRAY);
+    }
+
+    // display EMPLOYEE data
+    DrawEmployeeData(temp, numEmployees, startRow, numRows);
+    GuiTextBox(inputBox, inputBuffer, sizeof(inputBuffer) - 1, true);
+    
     EndDrawing();
-    //----------------------------------------------------------------------------------
   }
   CloseWindow(); // Close window and OpenGL context
 
