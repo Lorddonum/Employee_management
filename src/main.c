@@ -190,6 +190,10 @@ int main(int argc, char *argv[]) {
     }
   }
 
+    //----------------------------------------------------------------------------
+    // Initilization
+    //----------------------------------------------------------------------------
+
   if (!tflag) {
     //----------------------------------------------------------------------------
     // Gui main entry point
@@ -212,7 +216,7 @@ int main(int argc, char *argv[]) {
 
     SetTargetFPS(60);
 
-    size_t numEmployees = sizeof(temp) / sizeof(temp[0]);
+    size_t numEmployees = table_len;
     size_t numRows = numEmployees;
     size_t startRow = 0;
 

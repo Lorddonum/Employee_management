@@ -76,6 +76,8 @@ void load_all(char *path_to_disk_state) {
   size_t max_n = table_len =
       (table_len == 0) ? get_count(path_to_disk_state) : table_len;
 
+  global_table = allocate_hashtable(max_n);
+
   for (size_t i = 0; i < max_n; ++i) {
     if ((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
       global_table[i].val->mat = (uint16_t)sqlite3_column_int(stmt, 0);

@@ -92,12 +92,13 @@ void destruct_employee(EMPLOYEE *poor_soul);
 void show_employee(EMPLOYEE *node);
 void list_employees(void);
 size_t get_hash(EMPLOYEE emp);
+hash_table *allocate_hashtable(size_t n_elem);
 
 /* NOTE: datastore memory intercom see "sqlite.c" */
 void force_init(char *path_to_disk_state);
 void load_all(char *path_to_disk_state);
-size_t get_count(char *path_to_disk_state);
 void dump_all(char *path_to_disk_state);
+size_t get_count(char *path_to_disk_state);
 
 /* NOTE: search functions see "search.c" */
 size_t lev_dist(string *a, string *b);
