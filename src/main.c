@@ -198,75 +198,7 @@ int main(int argc, char *argv[]) {
   }
 
   if (!tflag) {
-
-    //----------------------------------------------------------------------------
-    // Gui main entry point
-    //----------------------------------------------------------------------------
-
-    const int screenWidth = 1200;
-    const int screenHeight = 800;
-
-    SetConfigFlags(FLAG_WINDOW_UNDECORATED);
-    InitWindow(screenWidth, screenHeight, "raygui - portable window");
-
-    // General variables
-    Vector2 mousePosition = {0};
-    Vector2 windowPosition = {500, 200};
-    Vector2 panOffset = mousePosition;
-    bool dragWindow = false;
-
-    SetWindowPosition((int)windowPosition.x, (int)windowPosition.y);
-
-    bool exitWindow = false;
-
-    SetTargetFPS(60);
-
-    //----------------------------------------------------------------------------
-    // Main loop
-    //----------------------------------------------------------------------------
-
-    // Detect window close button or ESC key
-    while (!exitWindow && !WindowShouldClose()) {
-      // Update
-      //----------------------------------------------------------------------------------
-      mousePosition = GetMousePosition();
-
-      if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && !dragWindow) {
-        if (CheckCollisionPointRec(mousePosition,
-                                   (Rectangle){0, 0, screenWidth, 20})) {
-          dragWindow = true;
-          panOffset = mousePosition;
-        }
-      }
-
-      if (dragWindow) {
-        windowPosition.x += (mousePosition.x - panOffset.x);
-        windowPosition.y += (mousePosition.y - panOffset.y);
-
-        SetWindowPosition((int)windowPosition.x, (int)windowPosition.y);
-
-        if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON))
-          dragWindow = false;
-      }
-      //----------------------------------------------------------------------------------
-
-      // Draw
-      //----------------------------------------------------------------------------------
-      BeginDrawing();
-
-      ClearBackground(RAYWHITE);
-
-      exitWindow = GuiWindowBox((Rectangle){0, 0, screenWidth, screenHeight},
-                                "#198# PORTABLE WINDOW");
-
-      DrawText(TextFormat("Mouse Position: [ %.0f, %.0f ]", mousePosition.x,
-                          mousePosition.y),
-               10, 40, 10, DARKGRAY);
-
-      EndDrawing();
-      //----------------------------------------------------------------------------------
-    }
-    CloseWindow(); // Close window and OpenGL context
+    // gui code goes here
   }
 
   if (tflag)
