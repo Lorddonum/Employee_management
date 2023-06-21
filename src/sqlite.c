@@ -40,7 +40,7 @@ void force_init(char *path_to_disk_state) {
 size_t get_count(char *path_to_disk_state) {
   sqlite3 *db;
   size_t count = 0;
-  char *stmt_txt = "SELECT COUNT(*) FROM Users";
+  char *stmt_txt = "SELECT COUNT(*) FROM EMPLOYEES";
   sqlite3_stmt *stmt;
   int rc = sqlite3_open_v2(path_to_disk_state, &db, SQLITE_OPEN_READONLY, NULL);
   if (rc != SQLITE_OK) {
@@ -82,8 +82,8 @@ void load_all(char *path_to_disk_state) {
     if ((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
       global_table[i].val->mat = (uint16_t)sqlite3_column_int(stmt, 0);
       global_table[i].val->salary = (uint16_t)sqlite3_column_int(stmt, 1);
-      stringcpy(global_table[i].val->namef, sqlite3_column_text(stmt, 2));
-      stringcpy(global_table[i].val->namel, sqlite3_column_text(stmt, 3));
+      stringdup(global_table[i].val->namef, sqlite3_column_text(stmt, 2));
+      stringdup(global_table[i].val->namel, sqlite3_column_text(stmt, 3));
       global_table[i].val->region.code = (uint8_t)sqlite3_column_int(stmt, 4);
       global_table[i].val->region.rate = (uint8_t)sqlite3_column_int(stmt, 5);
       global_table[i].key = get_hash(*global_table[i].val);
@@ -118,7 +118,7 @@ void dump_all(char *path_to_disk_state) {
   for (size_t i = 0; i < max_n; ++i) {
     asprintf(&stmt_txt,
              "INSERT INTO EMPLOYEES (salary , first , last , code , rate ), "
-             "VALUES (%d, '%s', '%s', %d, %d)",
+             "VALUES (%d, '%s', '%s', %d, %d);",
              global_table[i].val->salary, global_table[i].val->namef->ptr,
              global_table[i].val->namel->ptr, global_table[i].val->region.code,
              global_table[i].val->region.rate);
@@ -137,21 +137,23 @@ void dump_all(char *path_to_disk_state) {
 void add_entry(char *path_to_disk_state, EMPLOYEE *entry) {
   sqlite3 *db;
   char *stmt_txt = nullptr;
-  sqlite3_stmt *stmt;
+  // sqlite3_stmt *stmt;
 
   asprintf(&stmt_txt,
-           "INSERT INTO EMPLOYEES (salary , first , last , code , rate ), "
-           "VALUES (%d, '%s', '%s', %d, %d)",
+           "INSERT INTO EMPLOYEES (salary, first, last, code, rate) "
+           "VALUES (%d, '%s', '%s', %d, %d);",
            entry->salary, entry->namef->ptr, entry->namel->ptr,
            entry->region.code, entry->region.rate);
   int rc =
       sqlite3_open_v2(path_to_disk_state, &db, SQLITE_OPEN_READWRITE, NULL);
+
   if (rc != SQLITE_OK) {
     fprintf(stderr, "cannot open database: %s\n", sqlite3_errmsg(db));
     sqlite3_close(db);
   }
   char *err_msg = 0;
-  rc = sqlite3_exec(db, stmt, 0, 0, &err_msg);
+  rc = sqlite3_exec(db, stmt_txt, 0, 0, &err_msg);
+
   if (rc != SQLITE_OK) {
     fprintf(stderr, "SQL error: %s\n", err_msg);
     sqlite3_free(err_msg);
@@ -160,4 +162,31 @@ void add_entry(char *path_to_disk_state, EMPLOYEE *entry) {
   }
   sqlite3_close(db);
 }
-void modify_entry(char *path_to_disk_state, EMPLOYEE *entry) {}
+
+void modify_entry(char *path_to_disk_state, EMPLOYEE *entry) {
+  sqlite3 *db;
+  char *stmt_txt = nullptr;
+  sqlite3_stmt *stmt;
+
+  asprintf(&stmt_txt,
+           "UPDATE EMPLOYEES SET (salary, first, last, code, rate), "
+           "VALUES (%d, '%s', '%s', %d, %d)"
+           "WHERE id = %d",
+           entry->salary, entry->namef->ptr, entry->namel->ptr,
+           entry->region.code, entry->region.rate, entry->mat);
+  int rc =
+      sqlite3_open_v2(path_to_disk_state, &db, SQLITE_OPEN_READWRITE, NULL);
+  if (rc != SQLITE_OK) {
+    fprintf(stderr, "cannot open database: %s\n", sqlite3_errmsg(db));
+    sqlite3_close(db);
+  }
+  char *err_msg = 0;
+  rc = sqlite3_exec(db, stmt_txt, 0, 0, &err_msg);
+  if (rc != SQLITE_OK) {
+    fprintf(stderr, "SQL error: %s\n", err_msg);
+    sqlite3_free(err_msg);
+    sqlite3_close(db);
+    panic(nullptr);
+  }
+  sqlite3_close(db);
+}

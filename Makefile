@@ -3,7 +3,7 @@ SRC 				= src/employee.c src/shell.c src/main.c src/search.c src/sqlite.c src/ta
 OBJECTS 		= libs/static/libraylib.a
 ESSENTIAL 	= $(SRC:.c=.o)
 CFLAGS 			+= -std=c2x -pedantic -Wall -Wextra -g3 -ggdb
-LDFLAGS 		+= -leditline
+LDFLAGS 		+= -leditline -lm
 
 all: $(DEP) $(ESSENTIAL)
 	$(CC) $(CFLAGS) -o emp.out $(ESSENTIAL) $(OBJECTS) $(LDFLAGS)

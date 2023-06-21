@@ -1,11 +1,15 @@
+#ifndef _GNU_SOURCE
+#define _GNU_GNU_SOURCE
+#endif /* ifndef _GNU_SOURCE */
+
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <strings.h>
 
 #include <editline.h>
 #include <string.h>
+#include <strings.h>
 
 #include "all.h"
 
@@ -110,10 +114,29 @@ static inline void print_help(void) {
 
 static inline void print_help_set(void) {
   fprintf(stderr, "set - modify a parameter\n"
-                  "set foo - means bar\n");
+                  "set search <mode> - modify the search mode to either\n"
+                  "\tsearch modes:\n"
+                  "\t\tfuzz - fuzzy search\n"
+                  "\t\tlev - search using levenshtein distance\n"
+                  "\t\texact - search using exact search algorithm\n");
 }
 
-int shell_loop(char *path_to_disk_state, char *path_to_log_file) {
+static inline EMPLOYEE *el_getuser(void) {
+  EMPLOYEE *foo = create_employee();
+  puts("employee id:\n");
+  scanf("%hd", &foo->mat);
+  puts("employee first name\n");
+  getstring(foo->namef);
+  puts("employee last name\n");
+  getstring(foo->namel);
+  puts("employee region code\n");
+  scanf("%d", &foo->region.code);
+  puts("employee region rate\n");
+  scanf("%d", &foo->region.rate);
+  return foo;
+}
+
+int shell_loop(char *path_to_disk_state) {
   char *line;
   const char *HISTORY = ".emp_history";
   // we shall have a dynamic prompt
@@ -146,7 +169,7 @@ int shell_loop(char *path_to_disk_state, char *path_to_log_file) {
     else if (!strncmp(line, "init", 4))
       force_init(path_to_disk_state);
     else if (!strncmp(line, "add", 3))
-      add_employee(path_to_disk_state);
+      add_employee(el_getuser());
     else if (!strncmp(line, "load", 4))
       load_all(path_to_disk_state);
     else if (!strncmp(line, "listall", 7))

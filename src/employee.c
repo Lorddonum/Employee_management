@@ -85,8 +85,6 @@ EMPLOYEE *create_employee(void) {
   return local;
 }
 
-/// add employee object to hashtable
-
 /// frees employee fields
 void destruct_employee(EMPLOYEE *deleted) {
   free(deleted->namel);
@@ -108,8 +106,4 @@ void list_employees(void) {
   for (size_t i = 0; i < table_len; i++) {
     show_employee(global_table[i].val);
   }
-}
-
-void add_employee(EMPLOYEE unit) {
-
 }

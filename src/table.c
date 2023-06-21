@@ -9,12 +9,38 @@
 
 #include "all.h"
 
-void search_wrapper(search_mode set) {}
+void search_wrapper(search_mode set) {
+  switch (set) {
+  case fuzz:
+  case lev:
+  case exact:
+  }
+}
 
 EMPLOYEE *linear_search_namef(EMPLOYEE *table, string *key) {}
 EMPLOYEE *linear_search_namel(EMPLOYEE *table, string *key) {}
+
+EMPLOYEE *exact_match_namef(EMPLOYEE *table, string *key) {}
+EMPLOYEE *exact_match_namel(EMPLOYEE *table, string *key) {}
+
 EMPLOYEE *exact_match_mat(EMPLOYEE *table, string *key) {}
 EMPLOYEE *search_by_id(uint16_t key) {}
+
+void add_employee(char *path_to_disk_state, EMPLOYEE *unit) {
+  add_entry(path_to_disk_state, unit);
+  table_len += 1;
+  reallocate_hashtable(table_len);
+  copy_employee(global_table[table_len - 1].val, unit);
+}
+
+void copy_employee(EMPLOYEE *dest, EMPLOYEE *src) {
+  dest->mat = src->mat;
+  dest->salary = src->salary;
+  dest->region.code = src->region.code;
+  dest->region.rate = src->region.rate;
+  stringcpy(dest->namef, src->namef);
+  stringcpy(dest->namef, src->namef);
+}
 
 hash_table *allocate_hashtable(size_t n_elem) {
   hash_table *allocated = nullptr;

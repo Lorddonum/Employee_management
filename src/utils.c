@@ -38,7 +38,7 @@ inline void check_alloc(void *ptr) {
   if (ptr == nullptr) {
     fprintf(stderr, "Error value: %d\n", errno);
     fprintf(stderr, "%s\n", strerror(errno));
-    abort();
+    exit(2);
   }
 }
 
@@ -52,7 +52,7 @@ int check_string(char *buffer) {
 }
 
 /// copies a characters arrays into our custom string type
-void stringcpy(string *dest, const unsigned char *src) {
+void stringdup(string *dest, const unsigned char *src) {
   size_t len = 0;
   if ((len = strlen(src)) > dest->lim) {
     realloc(dest->ptr, sizeof(char) * (len));
@@ -63,8 +63,26 @@ void stringcpy(string *dest, const unsigned char *src) {
   strcpy(dest->ptr, src);
 }
 
+/// copies a string object into another string object
+void stringcpy(string *dest, string *src) {
+  dest->lim = src->lim;
+  dest->len = src->len;
+  strcpy(dest->ptr, src->ptr);
+}
+
+void getstring(string *arg) {
+  char buffer[100];
+  size_t len = 0;
+  scanf("%s", buffer);
+  len = strlen(buffer);
+  if (len > arg->lim)
+    unreachable();
+  arg->len = len;
+  strcpy(arg->ptr, buffer);
+}
+
 /// abort with an error message
-inline void panic(const char *msg) {
+[[noreturn]] inline void panic(const char *msg) {
   fputs(msg, stderr);
   abort();
 }

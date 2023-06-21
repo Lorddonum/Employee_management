@@ -86,20 +86,25 @@ extern size_t table_len;
 /* NOTE: general plumbing functions see "utils.c" */
 void check_alloc(void *ptr);
 int check_string(char *buffer);
-void panic(const char *msg);
 string *allocate_string(size_t size);
+void stringdup(string *dest, const unsigned char *src);
+void stringcpy(string *dest, string *src);
+void getstring(string *arg);
 void destruct_string(string *str);
 int cmp(int8_t a, int8_t b);
 size_t min(size_t a, size_t b);
-void stringcpy(string *dest, const unsigned char *src);
+[[noreturn]] void panic(const char *msg);
 
 /* NOTE: employee && hash table functions see "employee.c" and "table.c" */
 EMPLOYEE *create_employee(void);
 void destruct_employee(EMPLOYEE *poor_soul);
+void add_employee(char *path_to_disk_state, EMPLOYEE *unit);
+void copy_employee(EMPLOYEE *dest, EMPLOYEE *src);
 void show_employee(EMPLOYEE *node);
 void list_employees(void);
 size_t get_hash(EMPLOYEE emp);
 hash_table *allocate_hashtable(size_t n_elem);
+hash_table *reallocate_hashtable(size_t n_elem);
 
 EMPLOYEE *search_by_id(uint16_t key);
 void search_wrapper(search_mode set);
@@ -108,16 +113,16 @@ void search_wrapper(search_mode set);
 void force_init(char *path_to_disk_state);
 void load_all(char *path_to_disk_state);
 void dump_all(char *path_to_disk_state);
+void add_entry(char *path_to_disk_state, EMPLOYEE *entry);
 size_t get_count(char *path_to_disk_state);
 
 /* NOTE: search functions see "search.c" */
 size_t lev_dist(string *a, string *b);
 
 /* NOTE: shell functions see "shell.c" */
-int shell_loop(char *path_to_disk_state, char *path_to_log_file);
+int shell_loop(char *path_to_disk_state);
 
 /* NOTE: gui functions see "gui.c" */
-void DrawEmployeeData(EMPLOYEE *employees, int numEmployees, int startRow,
-                      int numRows);
+void DrawEmployeeData(int numEmployees, int startRow, int numRows);
 
 // vim: ft=c

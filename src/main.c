@@ -31,7 +31,7 @@
 #define RAYGUI_IMPLEMENTATION
 #include "../libs/raygui/src/raygui.h"
 
-#include "gui.c"
+// #include "gui.c"
 
 extern int errno;
 
@@ -46,6 +46,171 @@ bool aflag, vflag, qflag, cflag, sflag, tflag, lflag;
 
 hash_table *global_table = nullptr;
 size_t table_len = 0;
+
+void DrawEmployeeData(int numEmployees, int startRow, int numRows) {
+  int rowHeight = 20, y = 50, i;
+  DrawText("Register", 50, y, 20, BLACK);
+  DrawText("Salary", 150, y, 20, BLACK);
+  DrawText("FName", 300, y, 20, BLACK);
+  DrawText("LName", 500, y, 20, BLACK);
+  DrawText("Code", 650, y, 20, BLACK);
+  DrawText("Rate", 800, y, 20, BLACK);
+  DrawLine(48, y + 1.5 * rowHeight, 850, y + 1.5 * rowHeight, BLACK);
+  y += 2 * rowHeight;
+  for (i = startRow; i < startRow + numRows && i < numEmployees; i++) {
+    DrawText(TextFormat("%d", global_table[i].val->mat), 50, y, 20, BLACK);
+    DrawText(TextFormat("%d", global_table[i].val->salary), 150, y, 20, BLACK);
+    DrawText(global_table[i].val->namef->ptr, 300, y, 20, BLACK);
+    DrawText(global_table[i].val->namel->ptr, 500, y, 20, BLACK);
+    DrawText(TextFormat("%d", global_table[i].val->region.code), 650, y, 20,
+             BLACK);
+    DrawText(TextFormat("%d", global_table[i].val->region.rate), 800, y, 20,
+             BLACK);
+    y += rowHeight;
+  }
+}
+
+void DrawInputBox(Rectangle box, char *buffer, int bufferSize, bool active) {
+  static float backspaceHoldingTime = 0.0f;
+  const float initialBackspaceDelay = 0.5f;
+  const float backspaceRepeatDelay = 0.1f;
+
+  int visibleTextStart = 0;
+  int textWidth;
+
+  int maxVisibleCharacters;
+
+  DrawRectangleRec(box, LIGHTGRAY);
+  DrawRectangleLinesEx(box, 2, BLACK);
+
+  if (active) {
+    int key = GetCharPressed();
+
+    /// Check if more characters have been pressed on the same frame
+    while (key > 0) {
+      /// Only allow keys in range [32..125]
+      if ((key >= 32) && (key <= 125) && (strlen(buffer) < bufferSize - 1)) {
+        int len = strlen(buffer);
+        buffer[len] = (char)key;
+        buffer[len + 1] = '\0';
+      }
+      key = GetCharPressed(); /// Check next character in the queue
+    }
+
+    if (IsKeyDown(KEY_BACKSPACE)) {
+      backspaceHoldingTime += GetFrameTime();
+    } else {
+      backspaceHoldingTime = 0.0f;
+    }
+
+    if (backspaceHoldingTime > initialBackspaceDelay) {
+      if (((int)(backspaceHoldingTime * 10) %
+           (int)(backspaceRepeatDelay * 10)) == 0) {
+        int len = strlen(buffer);
+        if (len > 0) {
+          buffer[len - 1] = '\0';
+        }
+      }
+    }
+  }
+
+  textWidth = MeasureText(buffer, 20);
+  while (textWidth > box.width - 10) {
+    visibleTextStart++;
+    textWidth = MeasureText(buffer + visibleTextStart, 20);
+  }
+
+  maxVisibleCharacters = (box.width - 10) / MeasureText("A", 20);
+  char visibleBuffer[maxVisibleCharacters + 1];
+  strncpy(visibleBuffer, buffer + visibleTextStart, maxVisibleCharacters);
+  visibleBuffer[maxVisibleCharacters] = '\0';
+
+  DrawText(visibleBuffer, box.x + 5, box.y + (box.height / 4), 20, BLACK);
+
+  if (visibleTextStart > 0) {
+    DrawRectangleGradientH(box.x + 2, box.y + 2, 14, box.height - 4,
+                           Fade(LIGHTGRAY, 0.8f), LIGHTGRAY);
+  }
+}
+
+void SearchEmployee(int numEmployees, int startRow, int numRows, Rectangle box,
+                    char *buffer, int bufferSize, bool active) {
+  // Draw scrollbar
+  Rectangle scrollbar = {900.0, 50.0, 20.0, (float)(numRows * 20)};
+  bool scrollbarClicked = false;
+
+  // draw scrollbar and handle input
+  if (CheckCollisionPointRec(GetMousePosition(), scrollbar) ||
+      scrollbarClicked) {
+    if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
+      scrollbarClicked = true;
+      startRow = (GetMouseY() - scrollbar.y) * numEmployees / (numRows * 20);
+    } else {
+      scrollbarClicked = false;
+    }
+    DrawRectangleRec(scrollbar, DARKGRAY);
+  } else {
+    DrawRectangleRec(scrollbar, LIGHTGRAY);
+  }
+
+  DrawEmployeeData(numEmployees, startRow, numRows);
+  DrawInputBox(box, buffer, bufferSize, active);
+}
+
+void AddEmployee(void) { panic("no add employee implementation!!!\n"); }
+
+void RemoveEmployee(void) { panic("no remove employee implementation!!!\n"); }
+
+int DrawMenu(int numEmployees, int startRow, int numRows, Rectangle box,
+             char *buffer, int bufferSize, bool active) {
+  // Define positions, sizes, and colors
+  Vector2 titlePosition = {GetScreenWidth() / 2, 50};
+  int titleFontSize = 78;
+  Color titleColor = DARKGRAY;
+  Color shadowColor = BLACK;
+
+  Vector2 lineStart = {0, titlePosition.y + titleFontSize + 10};
+  Vector2 lineEnd = {GetScreenWidth(), lineStart.y};
+  Color lineColor = DARKGRAY;
+
+  Rectangle buttons[3] = {
+      {GetScreenWidth() / 2 - 150, lineEnd.y + 100, 300, 70},
+      {GetScreenWidth() / 2 - 150, lineEnd.y + 200, 300, 70},
+      {GetScreenWidth() / 2 - 150, lineEnd.y + 300, 300, 70}};
+  Color buttonColor = LIGHTGRAY;
+  const char *buttonText[] = {"Search for employee", "Add employee",
+                              "Remove employee"};
+  int buttonTextFontSize = 20;
+
+  // Draw title with shadow
+  DrawTextEx(GetFontDefault(), "Emp Manager",
+             (Vector2){titlePosition.x + 2, titlePosition.y + 2}, titleFontSize,
+             1, shadowColor);
+  DrawTextEx(GetFontDefault(), "Emp Manager", titlePosition, titleFontSize, 1,
+             titleColor);
+
+  // Draw line under title
+  DrawLineEx(lineStart, lineEnd, 4, lineColor);
+
+  // Draw rectangles with text inside
+  for (int i = 0; i < 3; i++) {
+    DrawRectangleRec(buttons[i], buttonColor);
+    Vector2 textSize =
+        MeasureTextEx(GetFontDefault(), buttonText[i], buttonTextFontSize, 1);
+    Vector2 textPosition = {buttons[i].x + (buttons[i].width - textSize.x) / 2,
+                            buttons[i].y +
+                                (buttons[i].height - textSize.y) / 2};
+    DrawTextEx(GetFontDefault(), buttonText[i], textPosition,
+               buttonTextFontSize, 1, RAYWHITE);
+    if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+      // Check if the mouse position is inside the rectangle
+      if (CheckCollisionPointRec(GetMousePosition(), buttons[i])) {
+        return i;
+      }
+    }
+  }
+  unreachable();
+}
 
 int main(int argc, char *argv[]) {
   /* cli */
@@ -166,7 +331,7 @@ int main(int argc, char *argv[]) {
   // redirect stderr to supplied path
   if (lflag) {
     FILE *fp = freopen(path_to_log_file, "a+", stderr);
-    if (fp == NULL) {
+    if (fp == nullptr) {
       panic("Fatal: failed redirection of stderr");
     }
   }
@@ -192,108 +357,57 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  //----------------------------------------------------------------------------
-  // Initilization
-  //----------------------------------------------------------------------------
-
-#if 0
   if (!tflag) {
     //----------------------------------------------------------------------------
-    // Gui main entry point
+    // Initilization
     //----------------------------------------------------------------------------
+    load_all(path_to_disk_state);
 
-    const int screenWidth = 1024;
-    const int screenHeight = 650;
+    const size_t Width = 1024;
+    const size_t Height = 650;
 
-    SetConfigFlags(FLAG_WINDOW_UNDECORATED);
-    InitWindow(screenWidth, screenHeight, "Employee Manager");
-
-    Vector2 mousePosition = {0};
-    Vector2 windowPosition = {500, 200};
-    Vector2 panOffset = mousePosition;
-    bool dragWindow = false;
-
-    SetWindowPosition((int)windowPosition.x, (int)windowPosition.y);
-
-    bool exitWindow = false;
-
+    InitWindow(Width, Height, "Employee Data");
     SetTargetFPS(60);
 
-    size_t numEmployees = table_len;
-    size_t numRows = numEmployees;
+    EMPLOYEE temp[4];
+
+    size_t numEmployees = sizeof(temp) / sizeof(temp[0]);
     size_t startRow = 0;
+    size_t numRows = 15;
 
-    Font defaultFont = GetFontDefault();
-    defaultFont.baseSize = 20;
-    GuiSetFont(defaultFont);
-
-    // create a scrollbar
-    Rectangle scrollbar = {900, 50, 20, numRows * 20};
-    bool scrollbarClicked = false;
-
+    // create an inputbox && input buffer
     char inputBuffer[256] = {0};
-    Rectangle inputBox = {screenWidth / 2 - 200, screenHeight - 70, 400, 40};
+    Rectangle inputBox = {(float)Width / 2.0 - 200.0, (float)Height - 70.0,
+                          (float)400.0, (float)40.0};
 
-    while (!exitWindow && !WindowShouldClose()) {
+    //------------------------------------------------------------------
+    //                            main loop
+    //------------------------------------------------------------------
 
-      mousePosition = GetMousePosition();
-
-      if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && !dragWindow) {
-        if (CheckCollisionPointRec(mousePosition,
-                                   (Rectangle){0, 0, screenWidth, 20})) {
-          dragWindow = true;
-          panOffset = mousePosition;
-        }
-      }
-
-      if (dragWindow) {
-        windowPosition.x += (mousePosition.x - panOffset.x);
-        windowPosition.y += (mousePosition.y - panOffset.y);
-
-        SetWindowPosition((int)windowPosition.x, (int)windowPosition.y);
-
-        if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON))
-          dragWindow = false;
-      }
-
+    while (!WindowShouldClose()) {
       BeginDrawing();
-
       ClearBackground(RAYWHITE);
-
-      exitWindow = GuiWindowBox((Rectangle){0, 0, screenWidth, screenHeight},
-                                "#198# PORTABLE WINDOW");
-
-      DrawText(TextFormat("Mouse Position: [ %.0f, %.0f ]", mousePosition.x,
-                          mousePosition.y),
-               10, 40, 10, DARKGRAY);
-
-      // draw scrollbar and handle input
-      if (CheckCollisionPointRec(GetMousePosition(), scrollbar) ||
-          scrollbarClicked) {
-        if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
-          scrollbarClicked = true;
-          startRow =
-              (GetMouseY() - scrollbar.y) * numEmployees / (numRows * 20);
-        } else {
-          scrollbarClicked = false;
+      SearchEmployee(numEmployees, startRow, numRows, inputBox, inputBuffer,
+                     sizeof(inputBuffer) - 1, true);
+      for (;;) {
+        switch (DrawMenu(numEmployees, startRow, numRows, inputBox, inputBuffer,
+                         sizeof(inputBuffer) - 1, true)) {
+        case fuzz:
+          break;
+        case exact:
+          break;
+        case lev:
+          break;
         }
-        DrawRectangleRec(scrollbar, DARKGRAY);
-      } else {
-        DrawRectangleRec(scrollbar, LIGHTGRAY);
       }
-
-      // display EMPLOYEE data
-      DrawEmployeeData(temp, numEmployees, startRow, numRows);
-      // display text input box
-      GuiTextBox(inputBox, inputBuffer, sizeof(inputBuffer) - 1, true);
-      EndDrawing();
     }
-    UnloadFont(defaultFont);
+    EndDrawing();
+
+    CloseWindow();
   }
 
-#endif
   if (tflag)
-    shell_loop(path_to_disk_state, path_to_log_file);
+    shell_loop(path_to_disk_state);
 
   // NOTE: more cleanup can always be done
   free(path_to_disk_state);
